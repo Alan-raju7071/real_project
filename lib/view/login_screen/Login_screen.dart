@@ -3,6 +3,7 @@ import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
 import 'package:real_project/widgets/Custom_image_container.dart';
+import 'package:real_project/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -137,20 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () {
                   
                   },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Colorconstants.primaryblue,
-                    ),
-                    child: Center(
-                      child: Text(
-                        TextConstants.login,
-                        style: TextStyle(color: Colorconstants.primarywhite),
-                      ),
-                    ),
-                  ),
+                  child: CustomButton(text: TextConstants.login, color: Colorconstants.primaryblue),
                 ),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -186,3 +174,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

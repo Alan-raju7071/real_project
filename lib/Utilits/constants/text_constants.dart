@@ -11,6 +11,10 @@ class TextConstants {
     static const String login="Log In";
      static const String register="Register";
      static const String dontacoount="Don't have an account?";
+      static const String Forgotpassword="Forgot Password";
+       static const String Enteremail="Enter your email address below to reset password.";
+        static const String email="Email Address";
+        static const String verifyemail="Verify email address";
 
     
 
