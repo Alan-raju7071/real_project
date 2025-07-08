@@ -17,6 +17,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+final passwordController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>(); 
   bool rememberMe = false;
   bool passwordVisible = false;
 
@@ -27,53 +31,58 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Center(
-              child: Text(
-                TextConstants.loginhead,
-                style: TextStyle(
-                  color: Colorconstants.primaryblack,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Center(child: Custom_image_container()),
-            const SizedBox(height: 10),
-            Text(
-              TextConstants.mainhead,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              TextConstants.logincontinue,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey, // ✅ Attach the form key
+            child: Column(
               children: [
+                Center(
+                  child: Text(
+                    TextConstants.loginhead,
+                    style: TextStyle(
+                      color: Colorconstants.primaryblack,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Center(child: Custom_image_container()),
+                const SizedBox(height: 10),
                 Text(
-                  TextConstants.mobilenumber,
+                  TextConstants.mainhead,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  TextConstants.logincontinue,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+
+                // Email Field
+                Text(
+                  TextConstants.email,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 CustomTextField(
-                  label: "Enter your mobile number",
-                  
+                  label: "Enter your email address",
+                  controller: loginProvider.emailController, // ✅ Important
                   labelColor: Colorconstants.primarygrey,
-                  keyboardType: TextInputType.phone,
+                  keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your mobile number';
+                      return 'Please enter your email address';
                     }
-                    if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
-                      return 'Enter a valid 10-digit phone number';
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'Enter a valid email address';
                     }
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
+
+                // Password Field
                 Text(
                   TextConstants.password,
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -104,7 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 20),
+
+                // Remember Me & Forgot Password
                 Row(
                   children: [
                     Checkbox(
@@ -139,13 +151,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 20),
 
+                // Login Button
                 loginProvider.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : InkWell(
                         onTap: () {
-                          loginProvider.onLogin(context);
+                          if (_formKey.currentState!.validate()) {
+                            loginProvider.onLogin(context); // ✅ Only if valid
+                          }
                         },
                         child: CustomButton(
                           text: TextConstants.login,
@@ -153,13 +169,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
 
+                const SizedBox(height: 20),
+
+                // Register Option
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(TextConstants.dontacoount),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(),));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        );
                       },
                       child: Text(
                         TextConstants.register,
@@ -174,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
