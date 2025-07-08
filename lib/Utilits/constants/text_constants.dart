@@ -15,6 +15,17 @@ class TextConstants {
        static const String Enteremail="Enter your email address below to reset password.";
         static const String email="Email Address";
         static const String verifyemail="Verify email address";
+        static const String fourdigitl="Enter the four-digit OTP code send to your email \naddress p**********@gmail.com.";
+        static const String verifOTP="Verify OTP code";
+        static const String dontrecived="Didin't recieved the email?";
+        static const String clickresend="Click to resend";
+        static const String restpass="Reset Your Password";
+        static const String mustpass="The Password must be different than before";
+         static const String newpass="New Password";
+          static const String confpass="Confirm Password";
+           static const String setpass="Reset Password";
+            static const String resetpasssucces="Password reset succesfully!";
+             static const String havesucces="You have succesfully reset Your password \nclick below to login in with your new password";
 
     
 

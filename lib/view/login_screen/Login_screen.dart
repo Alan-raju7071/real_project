@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
+import 'package:real_project/view/Forgot_password/Forgot_password.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
 import 'package:real_project/widgets/Custom_image_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
@@ -120,12 +121,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const Spacer(),
-                    Text(
-                      TextConstants.forgotpassword,
-                      style: TextStyle(
-                        color: Colorconstants.blueAccent,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colorconstants.blueAccent,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPassword(),));
+                      },
+                      child: Text(
+                        TextConstants.forgotpassword,
+                        style: TextStyle(
+                          color: Colorconstants.blueAccent,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colorconstants.blueAccent,
+                        ),
                       ),
                     ),
                   ],
