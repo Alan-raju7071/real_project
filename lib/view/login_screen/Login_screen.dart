@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
 import 'package:real_project/view/Forgot_password/Forgot_password.dart';
+import 'package:real_project/view/Register_screen/Register_screen.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
 import 'package:real_project/widgets/Custom_image_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
+import 'package:real_project/contoller/Login_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +22,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loginProvider = Provider.of<LoginProvider>(context);
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -36,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             const Center(child: Custom_image_container()),
-             const SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               TextConstants.mainhead,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -46,8 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-
-            
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -57,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 CustomTextField(
                   label: "Enter your mobile number",
+                  
                   labelColor: Colorconstants.primarygrey,
                   keyboardType: TextInputType.phone,
                   validator: (value) {
@@ -76,13 +80,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 CustomTextField(
                   label: "Enter your password",
+                  controller: loginProvider.passwordController,
                   labelColor: Colorconstants.primarygrey,
                   obscureText: !passwordVisible,
                   suffix: IconButton(
                     icon: Icon(
-                      passwordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                      passwordVisible ? Icons.visibility : Icons.visibility_off,
                       color: Colorconstants.primarygrey,
                     ),
                     onPressed: () {
@@ -102,13 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                
                 Row(
                   children: [
                     Checkbox(
                       value: rememberMe,
-                      
                       onChanged: (value) {
                         setState(() {
                           rememberMe = value!;
@@ -123,7 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Spacer(),
                     InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPassword(),));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ForgotPassword()),
+                        );
                       },
                       child: Text(
                         TextConstants.forgotpassword,
@@ -136,42 +139,39 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
-                
-                InkWell(
-                  onTap: () {
-                  
-                  },
-                  child: CustomButton(text: TextConstants.login, color: Colorconstants.primaryblue),
-                ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                   children: [
-                     Text(TextConstants.dontacoount),
-                     TextButton(
-                      onPressed: () {
-                        
-                        Navigator.pop(context);
-                      },
-                       child: TextButton(
-                        onPressed: () {
-                          // Navigator.push(context,
-                          //  MaterialPageRoute(builder: (context) => RegistrationScreen(),));
+                loginProvider.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : InkWell(
+                        onTap: () {
+                          loginProvider.onLogin(context);
                         },
-                         child: Text(TextConstants.register,
-                         style: TextStyle(
-                          color: Colorconstants.blueAccent,
-                           decoration: TextDecoration.underline,
-                        decorationColor: Colorconstants.blueAccent,
+                        child: CustomButton(
+                          text: TextConstants.login,
+                          color: Colorconstants.primaryblue,
+                        ),
+                      ),
 
-                         ),
-                         ),
-                       ),
-                     )
-                   ],
-                 )
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(TextConstants.dontacoount),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(),));
+                      },
+                      child: Text(
+                        TextConstants.register,
+                        style: TextStyle(
+                          color: Colorconstants.blueAccent,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colorconstants.blueAccent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ],
@@ -180,4 +180,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:real_project/contoller/Login_controller.dart';
 import 'package:real_project/contoller/Register_controller.dart';
 import 'package:real_project/view/Register_screen/Register_screen.dart';
+import 'package:real_project/view/login_screen/Login_screen.dart';
 
 
 import 'firebase_options.dart';
@@ -19,6 +21,8 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) =>  RegisterProvider()),
+        ChangeNotifierProvider(create: (context) =>  LoginProvider()),
+
       ],
       child: const MyApp(),
     ),
@@ -32,7 +36,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const RegisterScreen(),
+      home: const LoginScreen(),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:real_project/view/login_screen/Login_screen.dart';
 
 class RegisterProvider with ChangeNotifier {
   final nameController = TextEditingController();
@@ -45,6 +46,11 @@ class RegisterProvider with ChangeNotifier {
       nameController.clear();
       emailController.clear();
       passwordController.clear();
+      Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(builder: (context) => LoginScreen()),
+);
+
     } on FirebaseAuthException catch (e) {
       _showSnackbar(context, e.message ?? "Registration failed");
     } finally {
