@@ -32,6 +32,14 @@ class TextConstants {
                static const String alreadyacc="Already You have an account?";
                static const String createacc="Create Account";
                 static const String sendOTP="Send OTP";
+                static const String pincod="Pin code";
+                static const String city="City";
+                 static const String state="State";
+                  static const String country="Country";
+                   static const String Gender="Gender";
+                    static const String datebirth="Date of Birth";
+                     static const String continu="Continue";
+                
               
 
     

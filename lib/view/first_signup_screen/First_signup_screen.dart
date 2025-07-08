@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Add this to pubspec.yaml
+import 'package:intl/intl.dart'; 
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
+import 'package:real_project/widgets/User_details_container.dart';
+import 'package:real_project/widgets/custom_button.dart';
+import 'package:real_project/widgets/linear_indicator_with_text.dart';
 
 class FirstSignupScreen extends StatefulWidget {
   const FirstSignupScreen({super.key});
@@ -41,7 +44,7 @@ class _FirstSignupScreenState extends State<FirstSignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title
+              
               Text(
                 TextConstants.signup,
                 style: TextStyle(
@@ -52,41 +55,18 @@ class _FirstSignupScreenState extends State<FirstSignupScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Step labels
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(steps.length, (index) {
-                  return Text(
-                    steps[index],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: index == currentStep
-                          ? Colors.blue
-                          : Colors.grey.shade600,
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 6),
-
-              // Progress bar
-              LinearProgressIndicator(
-                value: (currentStep + 1) / steps.length,
-                backgroundColor: Colors.grey.shade300,
-                color: Colors.blue,
-                minHeight: 5,
-              ),
+              
+              linear_indicator_with_text(steps: steps, currentStep: currentStep),
               const SizedBox(height: 24),
 
-              // Header
+            
               const Text(
                 TextConstants.createacc,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
-              // Avatar
+              
               Center(
                 child: Stack(
                   children: [
@@ -116,159 +96,169 @@ class _FirstSignupScreenState extends State<FirstSignupScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Username
-              const Text(
-                TextConstants.username,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              CustomTextField(
-                label: "Enter your username",
-                labelColor: Colorconstants.primarygrey,
-                keyboardType: TextInputType.text,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-
-              // Email
-              const Text(
-                TextConstants.email,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              CustomTextField(
-                label: "Enter your email address",
-                labelColor: Colorconstants.primarygrey,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                    return 'Enter a valid email address';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-
-              // Mobile
-              const Text(
-                TextConstants.mobilenumber,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: CustomTextField(
-                      label: "Enter your mobile number",
-                      labelColor: Colorconstants.primarygrey,
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your mobile number';
-                        }
-                        if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
-                          return 'Enter a valid 10-digit phone number';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Material(
-                    elevation: 2,
-                    borderRadius: BorderRadius.circular(5),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 6),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        TextConstants.sendOTP,
-                        style: TextStyle(
-                          color: Colorconstants.primaryblack,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                  User_details_container(dobController: dobController,
+  selectedGender: selectedGender,
+  onDateTap: () => _selectDate(context),
+  onGenderChanged: (value) {
+    setState(() {
+      selectedGender = value;
+    });
+  },),
+              const SizedBox(height: 20),
+              Material(
+                elevation: 2,
+                shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                child: Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(TextConstants.country, style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Country',
+                        labelStyle: TextStyle(color: Colorconstants.primarygrey,),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                       ),
+                      items: ['India', 'USA', 'UK'].map((country) {
+                        return DropdownMenuItem(
+                          value: country,
+                          child: Text(country),
+                        );
+                      }).toList(),
+                      onChanged: (value) {},
+                    ),
+                  ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(TextConstants.state, style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'State',
+                        labelStyle: TextStyle(color: Colorconstants.primarygrey,),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      ),
+                      items: ['Kerala', 'Maharashtra', 'Delhi'].map((state) {
+                        return DropdownMenuItem(
+                          value: state,
+                          child: Text(state),
+                        );
+                      }).toList(),
+                      onChanged: (value) {},
+                    ),
+                  ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                  
+                      
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(TextConstants.city, style: TextStyle(fontWeight: FontWeight.bold)),
+                     CustomTextField(label: "City",
+                    labelColor: Colorconstants.primarygrey,
+                   
+                   )
+                    
+                  ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(TextConstants.pincod, style: TextStyle(fontWeight: FontWeight.bold)),
+                    
+                   CustomTextField(label: "Pin Code",
+                    labelColor: Colorconstants.primarygrey,
+                   
+                   )
+                  ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 20,),
+              Material(
+                elevation: 2,
+                shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    
+                    borderRadius: BorderRadius.circular(12),
+                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                       Text('Qualification', style: TextStyle(fontWeight: FontWeight.bold)),
+                      CustomTextField(label: 'Select Qualification',
+                       labelColor: Colorconstants.primarygrey,
+                     ),
+                  SizedBox(height: 16),
+                  Text('Occupation', style: TextStyle(fontWeight: FontWeight.bold)),
+                      CustomTextField(label: 'Select occupation',
+                       labelColor: Colorconstants.primarygrey,
+                        ),
+                    const SizedBox(height: 16),
+                        const Text(
+                        'Referral Code (Optional)',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 6),
+                      CustomTextField(label: 'Enter referral code',
+                       labelColor: Colorconstants.primarygrey,
 
-              // Date of Birth
-              const Text(
-                'Date of Birth',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: dobController,
-                readOnly: true,
-                onTap: () => _selectDate(context),
-                decoration: InputDecoration(
-                  hintText: 'Pick a Date',
-                  suffixIcon: const Icon(Icons.calendar_today),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                      ),
+                     
+                    ],
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select your date of birth';
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 10),
-                            // Gender Dropdown
-              const Text(
-                'Gender',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              DropdownButtonFormField<String>(
-                value: selectedGender,
-                decoration: InputDecoration(
-                  hintText: 'Select Gender',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                ),
-                items: ['Male', 'Female', 'Other'].map((gender) {
-                  return DropdownMenuItem<String>(
-                    value: gender,
-                    child: Text(gender),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedGender = value;
-                  });
-                },
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Please select a gender' : null,
-              ),
-              const SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: CustomButton(text: TextConstants.continu, color:  Colorconstants.primaryblue),
+              )
 
 
-              
-            ],
+ ],
           ),
         ),
       ),
     );
   }
 }
+
