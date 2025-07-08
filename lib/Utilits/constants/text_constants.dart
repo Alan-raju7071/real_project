@@ -26,6 +26,13 @@ class TextConstants {
            static const String setpass="Reset Password";
             static const String resetpasssucces="Password reset succesfully!";
              static const String havesucces="You have succesfully reset Your password \nclick below to login in with your new password";
+              static const String detailsbelow="Please enter your details below";
+              static const String username="User Name";
+              static const String signup="Sign Up";
+               static const String alreadyacc="Already You have an account?";
+               static const String createacc="Create Account";
+                static const String sendOTP="Send OTP";
+              
 
     
 
