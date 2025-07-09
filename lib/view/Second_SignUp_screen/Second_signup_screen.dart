@@ -35,6 +35,18 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+         actions: [
+        IconButton(
+          icon: const Icon(Icons.logout, color: Colors.red),
+          onPressed: () {
+            
+            
+            Navigator.popUntil(context, (route) => route.isFirst); 
+          },
+        ),
+      ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(

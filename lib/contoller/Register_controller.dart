@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:real_project/view/Second_SignUp_screen/Second_signup_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:real_project/view/login_screen/Login_screen.dart';
+
 
 class RegisterProvider with ChangeNotifier {
   final nameController = TextEditingController();
@@ -13,6 +17,7 @@ class RegisterProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Register a new user
   Future<void> registerUser(BuildContext context) async {
     final name = nameController.text.trim();
     final email = emailController.text.trim();
@@ -23,16 +28,26 @@ class RegisterProvider with ChangeNotifier {
       return;
     }
 
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      _showSnackbar(context, "Enter a valid email");
+      return;
+    }
+
+    if (password.length < 6) {
+      _showSnackbar(context, "Password must be at least 6 characters");
+      return;
+    }
+
     try {
       _setLoading(true);
 
-    
+      // Register user with Firebase Auth
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      
+      // Store user details in Firestore
       await _firestore.collection("users").doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'name': name,
@@ -40,30 +55,65 @@ class RegisterProvider with ChangeNotifier {
         'createdAt': Timestamp.now(),
       });
 
+      // Store login flag in SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+
       _showSnackbar(context, "Registration Successful");
 
-      
-      nameController.clear();
-      emailController.clear();
-      passwordController.clear();
-      Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(builder: (context) => LoginScreen()),
-);
+      clearControllers();
 
+      // Navigate to home screen or next screen after registration
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SecondSignupScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       _showSnackbar(context, e.message ?? "Registration failed");
+    } catch (e) {
+      _showSnackbar(context, "An error occurred");
     } finally {
       _setLoading(false);
     }
   }
 
+  /// Set loading state
   void _setLoading(bool value) {
     isLoading = value;
     notifyListeners();
   }
 
+  /// Show a snackbar message
   void _showSnackbar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  /// Dispose controllers to avoid memory leaks
+  void clearControllers() {
+    nameController.clear();
+    emailController.clear();
+    passwordController.clear();
+  }
+
+  /// Optional: Call this if you need to dispose the provider fully
+  void disposeControllers() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
+
+  /// Logout utility method
+  Future<void> logout(BuildContext context) async {
+    await _auth.signOut();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
   }
 }

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
+import 'package:real_project/view/Second_SignUp_screen/Second_signup_screen.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
 import 'package:real_project/widgets/User_details_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
@@ -268,9 +269,14 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
 
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                child: CustomButton(
-                  text: TextConstants.continu,
-                  color: Colorconstants.primaryblue,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => SecondSignupScreen(),));
+                  },
+                  child: CustomButton(
+                    text: TextConstants.continu,
+                    color: Colorconstants.primaryblue,
+                  ),
                 ),
               ),
             ],
