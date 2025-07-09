@@ -39,6 +39,15 @@ class TextConstants {
                    static const String Gender="Gender";
                     static const String datebirth="Date of Birth";
                      static const String continu="Continue";
+                       static const String title="Facebook";
+                       static const String subtitle="Follow us on Facebook";
+                       static const String follow="Follow";
+                       static const String followedtext="I've Followed";
+                       static const String instasubtitle="Follow us on Instagram";
+                       static const String instatitle="Instagram";
+                       static const String yotubsubtitle="Subscribe to our YouTube";
+                       static const String yutibtitle="YouTube";
+                       
                 
               
 
