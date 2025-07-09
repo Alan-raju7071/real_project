@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:real_project/contoller/Login_controller.dart';
 import 'package:real_project/contoller/Register_controller.dart';
 import 'package:real_project/view/Register_screen/Register_screen.dart';
+import 'package:real_project/view/first_signup_screen/First_signup_screen.dart';
 import 'package:real_project/view/login_screen/Login_screen.dart';
 
 
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const FirstSignupScreen()
     );
   }
 }
