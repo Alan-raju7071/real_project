@@ -18,26 +18,24 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginState();
+    _navigateAfterDelay();
   }
 
-  Future<void> _checkLoginState() async {
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _navigateAfterDelay() async {
+    await Future.delayed(const Duration(seconds: 2)); // Show splash for 2 seconds
 
     final prefs = await SharedPreferences.getInstance();
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const FirstSignupScreen()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    }
+    if (!mounted) return;
+
+    // Navigate based on login state
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => isLoggedIn ? const FirstSignupScreen() : const LoginScreen(),
+      ),
+    );
   }
 
   @override
@@ -66,6 +64,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Colorconstants.primarygrey,
               ),
             ),
+            const SizedBox(height: 30),
+            const CircularProgressIndicator(color: Colors.blueAccent),
           ],
         ),
       ),

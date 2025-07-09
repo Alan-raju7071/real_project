@@ -17,10 +17,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-final passwordController = TextEditingController();
-
-  final _formKey = GlobalKey<FormState>(); 
+  final _formKey = GlobalKey<FormState>();
   bool rememberMe = false;
   bool passwordVisible = false;
 
@@ -29,13 +26,16 @@ final passwordController = TextEditingController();
     final loginProvider = Provider.of<LoginProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colorconstants.primarywhite,
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
           child: Form(
-            key: _formKey, // ✅ Attach the form key
+            key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Title
                 Center(
                   child: Text(
                     TextConstants.loginhead,
@@ -47,26 +47,33 @@ final passwordController = TextEditingController();
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Logo
                 const Center(child: Custom_image_container()),
                 const SizedBox(height: 10),
-                Text(
-                  TextConstants.mainhead,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  TextConstants.logincontinue,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+
+                // Headings
+                Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        TextConstants.mainhead,
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        TextConstants.logincontinue,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
 
                 // Email Field
-                Text(
-                  TextConstants.email,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text(TextConstants.email, style: const TextStyle(fontWeight: FontWeight.bold)),
                 CustomTextField(
                   label: "Enter your email address",
-                  controller: loginProvider.emailController, // ✅ Important
+                  controller: loginProvider.emailController,
                   labelColor: Colorconstants.primarygrey,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -79,14 +86,10 @@ final passwordController = TextEditingController();
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 16),
 
                 // Password Field
-                Text(
-                  TextConstants.password,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                Text(TextConstants.password, style: const TextStyle(fontWeight: FontWeight.bold)),
                 CustomTextField(
                   label: "Enter your password",
                   controller: loginProvider.passwordController,
@@ -113,7 +116,6 @@ final passwordController = TextEditingController();
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 20),
 
                 // Remember Me & Forgot Password
@@ -123,11 +125,10 @@ final passwordController = TextEditingController();
                       value: rememberMe,
                       onChanged: (value) {
                         setState(() {
-                          rememberMe = value!;
+                          rememberMe = value ?? false;
                         });
                       },
                     ),
-                    const SizedBox(width: 4),
                     Text(
                       TextConstants.remembberme,
                       style: const TextStyle(fontWeight: FontWeight.bold),
@@ -137,7 +138,7 @@ final passwordController = TextEditingController();
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ForgotPassword()),
+                          MaterialPageRoute(builder: (_) => const ForgotPassword()),
                         );
                       },
                       child: Text(
@@ -145,22 +146,20 @@ final passwordController = TextEditingController();
                         style: TextStyle(
                           color: Colorconstants.blueAccent,
                           decoration: TextDecoration.underline,
-                          decorationColor: Colorconstants.blueAccent,
                         ),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
-                // Login Button
+                // Login Button or Loading Indicator
                 loginProvider.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : InkWell(
                         onTap: () {
                           if (_formKey.currentState!.validate()) {
-                            loginProvider.onLogin(context); // ✅ Only if valid
+                            loginProvider.onLogin(context);
                           }
                         },
                         child: CustomButton(
@@ -171,7 +170,7 @@ final passwordController = TextEditingController();
 
                 const SizedBox(height: 20),
 
-                // Register Option
+                // Register Redirect
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -180,7 +179,7 @@ final passwordController = TextEditingController();
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
                         );
                       },
                       child: Text(
@@ -188,7 +187,6 @@ final passwordController = TextEditingController();
                         style: TextStyle(
                           color: Colorconstants.blueAccent,
                           decoration: TextDecoration.underline,
-                          decorationColor: Colorconstants.blueAccent,
                         ),
                       ),
                     ),
