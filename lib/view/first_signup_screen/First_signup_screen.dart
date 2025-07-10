@@ -13,6 +13,14 @@ import 'package:real_project/widgets/User_details_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
 import 'package:real_project/widgets/linear_indicator_with_text.dart';
 import 'package:file_picker/file_picker.dart';
+String formatDateAndAge(DateTime date) {
+  final now = DateTime.now();
+  int age = now.year - date.year;
+  if (now.month < date.month || (now.month == date.month && now.day < date.day)) {
+    age--;
+  }
+  return "${DateFormat('dd/MM/yyyy').format(date)} (Age: $age)";
+}
 
 class FirstSignupScreen extends StatefulWidget {
   const FirstSignupScreen({super.key});
@@ -64,18 +72,19 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
   }
 
   Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        dobController.text = DateFormat('dd/MM/yyyy').format(picked);
-      });
-    }
+  final DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: DateTime(2000),
+    firstDate: DateTime(1900),
+    lastDate: DateTime.now(),
+  );
+  if (picked != null) {
+    setState(() {
+      dobController.text = formatDateAndAge(picked);
+    });
   }
+}
+
 
   @override
   void dispose() {
