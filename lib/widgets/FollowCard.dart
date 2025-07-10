@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/image_constants.dart';
 
 class FacebookCard extends StatefulWidget {
@@ -98,22 +99,30 @@ class _FacebookCardState extends State<FacebookCard> {
                 ),
               ),
               const Spacer(),
-              GestureDetector(
-                onTap: widget.onFollow,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF3B5998), Color(0xFF8B9DC3)],
-                    ),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    widget.followed ? widget.followedsstext : widget.followtext,
-                    style: TextStyle(color: widget.followed ? Colors.white : Colors.black),
-                  ),
-                ),
-              ),
+             GestureDetector(
+  onTap: widget.onFollow,
+  child: Container(
+   height: MediaQuery.of(context).size.height * 0.05, 
+    width: MediaQuery.of(context).size.width * 0.3, 
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Colorconstants.darkblue, Colorconstants.darkviolet],
+      ),
+      borderRadius: BorderRadius.circular(6),
+    ),
+    alignment: Alignment.center, 
+    child: Text(
+      widget.followed ? widget.followedsstext : widget.followtext,
+      style: TextStyle(
+        color: widget.followed ? Colors.white : Colors.white,
+        fontSize: 14, 
+        fontWeight: FontWeight.w500, 
+      ),
+    ),
+  ),
+),
+
             ],
           ),
         ],

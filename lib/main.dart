@@ -6,6 +6,7 @@ import 'package:real_project/contoller/Login_controller.dart';
 import 'package:real_project/contoller/Register_controller.dart';
 import 'package:real_project/view/Splash_screen/Splash_screen.dart';
 import 'package:real_project/view/followed_screen/Followed_screen.dart';
+import 'package:real_project/view/login_screen/Login_screen.dart';
 
 import 'firebase_options.dart';
 
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       
-      home:  FollowScreen(),
+      home:  SplashScreen(),
     );
   }
 }

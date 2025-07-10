@@ -47,7 +47,15 @@ class TextConstants {
                        static const String instatitle="Instagram";
                        static const String yotubsubtitle="Subscribe to our YouTube";
                        static const String yutibtitle="YouTube";
-                       
+                       static const String watssubtitle="Join our WhatsApp Broadcast ";
+                       static const String watstitle="WhatsApp";
+                       static const String subscribe="Subscribe";
+                        static const String subscribed="I've Subscribed";
+                         static const String join="Join";
+                        static const String joined="I've Joined";
+                         static const String welcpost="Welcom to \nPulse Post!";
+                          static const String getstart="To get started, please follow us on \nthe platforms below. this helps you stay \ninformed and get priority in tasks";
+                           static const String followabove="please follow all platforms above to unlock access";
                 
               
 

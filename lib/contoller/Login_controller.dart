@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:real_project/view/followed_screen/Followed_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:real_project/view/first_signup_screen/First_signup_screen.dart';
@@ -11,7 +12,7 @@ class LoginProvider with ChangeNotifier {
 
   bool isLoading = false;
 
-  /// Login user
+  
   Future<void> onLogin(BuildContext context) async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -34,11 +35,11 @@ class LoginProvider with ChangeNotifier {
     try {
       _setLoading(true);
 
-      // Sign in with Firebase Auth
+      
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // Store login flag in SharedPreferences
+      
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
 
@@ -46,10 +47,10 @@ class LoginProvider with ChangeNotifier {
 
       clearControllers();
 
-      // Navigate to first signup or home screen
+      
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const FirstSignupScreen()),
+        MaterialPageRoute(builder: (context) => const FollowScreen()),
       );
     } on FirebaseAuthException catch (e) {
       String message = "Login failed";

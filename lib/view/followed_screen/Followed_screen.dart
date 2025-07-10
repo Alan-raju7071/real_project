@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/image_constants.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
+import 'package:real_project/view/Splash_screen/Splash_screen.dart';
+import 'package:real_project/widgets/Custom_image_container.dart';
 import 'package:real_project/widgets/FollowCard.dart';
 
 
@@ -22,23 +25,33 @@ class _FollowScreenState extends State<FollowScreen> {
       
       body: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Progress", style: TextStyle(fontWeight: FontWeight.bold)),
-                Text("$completed/4", style: const TextStyle(fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(value: completed / 4),
-            const SizedBox(height: 16),
-
-            
-            Expanded(
-              child: ListView(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Custom_image_container(),
+              ),
+              Text(TextConstants.welcpost,style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold,color: Colorconstants.primaryblue),),
+              SizedBox(height: 10,),
+              Text(TextConstants.getstart),
+              SizedBox(height: 10,),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Progress", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text("$completed/4", style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              LinearProgressIndicator(value: completed / 4),
+              const SizedBox(height: 16),
+          
+              
+              ListView(
+                physics: const NeverScrollableScrollPhysics(), 
+                 shrinkWrap: true, 
                 
                 children: [
                   FacebookCard(
@@ -70,11 +83,11 @@ class _FollowScreenState extends State<FollowScreen> {
                     },
                   ),
                    FacebookCard(
-                    followe: TextConstants.follow,
+                    followe: TextConstants.subscribe,
                     tile: TextConstants.yutibtitle,
                     subtitles: TextConstants.yotubsubtitle,
-                    followtext: TextConstants.follow,
-                    followedsstext: TextConstants.followedtext,
+                    followtext: TextConstants.subscribe,
+                    followedsstext: TextConstants.subscribed,
                     imageUrl: ImageConstants.youTubelogo,
                     followed: followed[2],
                     onFollow: () {
@@ -84,11 +97,11 @@ class _FollowScreenState extends State<FollowScreen> {
                     },
                   ),
                    FacebookCard(
-                    followe: TextConstants.follow,
-                    tile: TextConstants.title,
-                    subtitles: TextConstants.subtitle,
-                    followtext: TextConstants.follow,
-                    followedsstext: TextConstants.followedtext,
+                    followe: TextConstants.join,
+                    tile: TextConstants.watstitle,
+                    subtitles: TextConstants.watssubtitle,
+                    followtext: TextConstants.join,
+                    followedsstext: TextConstants.joined,
                     imageUrl: ImageConstants.wattaapplogo,
                     followed: followed[3],
                     onFollow: () {
@@ -99,15 +112,37 @@ class _FollowScreenState extends State<FollowScreen> {
                   ),
                    ],
               ),
-            ),
-              ElevatedButton(
-              onPressed: completed == 4 ? () {} : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: completed == 4 ? Colors.blue : Colors.grey,
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),    
+                child: Text(TextConstants.followabove),
               ),
-              child: const Text("Complete all follows to continue"),
-            ),
-          ],
+               InkWell(
+                onTap: completed == 4
+      ? () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>SplashScreen ()),
+          );
+        }
+      : null,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                       color: completed == 4 ? Colors.blue : Colorconstants.primarygrey,
+                       borderRadius: BorderRadius.circular(5)
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10,),
+                   
+                    child: Center(child: Text("Complete all follows to continue",style: TextStyle(fontWeight: FontWeight.bold,color: Colorconstants.darkgrey),)),
+                  
+                  ),
+                ))
+              
+            ],
+          ),
         ),
       ),
     );
