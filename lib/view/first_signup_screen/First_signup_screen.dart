@@ -1,13 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:location/location.dart';
+ import 'dart:html' as html;
 
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
@@ -102,29 +103,85 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
   }
 
   Future<void> _autofillLocation() async {
-    try {
-      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) return;
+    if (kIsWeb) {
+      try {
+        
+       
 
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.deniedForever) return;
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
+        html.window.navigator.geolocation.getCurrentPosition().then((pos) async {
+          final lat = pos.coords?.latitude;
+          final lon = pos.coords?.longitude;
+
+          if (lat != null && lon != null) {
+            final response = await http.get(
+              Uri.parse('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=$lat&lon=$lon'),
+              headers: {'User-Agent': 'FlutterWebApp'},
+            );
+
+            if (response.statusCode == 200) {
+              final data = jsonDecode(response.body);
+              final address = data['address'];
+              setState(() {
+                city = address['city'] ?? address['town'] ?? address['village'] ?? '';
+                state = address['state'] ?? '';
+                pincode = address['postcode'] ?? '';
+                locationController.text = '$city, $state - $pincode';
+              });
+            } else {
+              showMessage("Failed to get location info from server.");
+            }
+          }
+        }).catchError((e) {
+          showMessage("Web geolocation failed: $e");
+        });
+      } catch (e) {
+        showMessage("Web location error: $e");
+      }
+      return;
+    }
+
+    try {
+      final location = Location();
+
+      bool serviceEnabled = await location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) {
+          showMessage("Location services are disabled.");
           return;
         }
       }
 
-      final pos = await Geolocator.getCurrentPosition();
-      final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
+      PermissionStatus permissionGranted = await location.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await location.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          showMessage("Location permission denied.");
+          return;
+        }
+      }
 
-      if (placemarks.isNotEmpty) {
-        final p = placemarks.first;
-        city = p.locality ?? '';
-        state = p.administrativeArea ?? '';
-        pincode = p.postalCode ?? '';
-        locationController.text = '$city, $state - $pincode';
+      final locData = await location.getLocation();
+
+      final response = await http.get(
+        Uri.parse(
+          'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${locData.latitude}&lon=${locData.longitude}',
+        ),
+        headers: {'User-Agent': 'FlutterApp'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final address = data['address'];
+
+        setState(() {
+          city = address['city'] ?? address['town'] ?? address['village'] ?? '';
+          state = address['state'] ?? '';
+          pincode = address['postcode'] ?? '';
+          locationController.text = '$city, $state - $pincode';
+        });
+      } else {
+        showMessage("Failed to get location info from server.");
       }
     } catch (e) {
       debugPrint("Location Error: $e");
@@ -254,8 +311,6 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
               TextField(
                 controller: occupationController,
                 decoration: InputDecoration(

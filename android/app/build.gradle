@@ -1,9 +1,16 @@
-plugins {
-    id "com.android.application"                      // ✅ NO VERSION HERE
-    id "com.google.gms.google-services"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+    plugins {
+        id "com.android.application" version "8.6.0"      // ✅ Correct version
+        id "org.jetbrains.kotlin.android" version "1.9.30" // ✅ or whatever version you're using
+        id "com.google.gms.google-services" version "4.4.1"
+    }
 }
+
 
 android {
     namespace = "com.example.real_project"
