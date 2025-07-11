@@ -17,7 +17,7 @@ class RegisterProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Register a new user
+  
   Future<void> registerUser(BuildContext context) async {
     final name = nameController.text.trim();
     final email = emailController.text.trim();
@@ -41,13 +41,13 @@ class RegisterProvider with ChangeNotifier {
     try {
       _setLoading(true);
 
-      // Register user with Firebase Auth
+      
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Store user details in Firestore
+      
       await _firestore.collection("users").doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'name': name,
@@ -55,7 +55,7 @@ class RegisterProvider with ChangeNotifier {
         'createdAt': Timestamp.now(),
       });
 
-      // Store login flag in SharedPreferences
+      
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
 
@@ -63,7 +63,7 @@ class RegisterProvider with ChangeNotifier {
 
       clearControllers();
 
-      // Navigate to home screen or next screen after registration
+      
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const SecondSignupScreen()),
@@ -77,34 +77,34 @@ class RegisterProvider with ChangeNotifier {
     }
   }
 
-  /// Set loading state
+
   void _setLoading(bool value) {
     isLoading = value;
     notifyListeners();
   }
 
-  /// Show a snackbar message
+  
   void _showSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
-  /// Dispose controllers to avoid memory leaks
+  
   void clearControllers() {
     nameController.clear();
     emailController.clear();
     passwordController.clear();
   }
 
-  /// Optional: Call this if you need to dispose the provider fully
+  
   void disposeControllers() {
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
   }
 
-  /// Logout utility method
+  
   Future<void> logout(BuildContext context) async {
     await _auth.signOut();
     final prefs = await SharedPreferences.getInstance();

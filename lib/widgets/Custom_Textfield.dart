@@ -7,7 +7,8 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final TextEditingController? controller;
-  final Widget? suffix; 
+  final Widget? suffix;
+  final EdgeInsetsGeometry contentPadding;
 
   const CustomTextField({
     super.key,
@@ -17,7 +18,8 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.validator,
     this.controller,
-    this.suffix, 
+    this.suffix,
+    this.contentPadding = const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
   });
 
   @override
@@ -26,13 +28,14 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       obscureText: obscureText,
       controller: controller,
+      validator: validator,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: labelColor ?? Colors.black),
-        border: const OutlineInputBorder(),
-        suffixIcon: suffix, 
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: contentPadding,
+        suffixIcon: suffix,
       ),
-      validator: validator,
     );
   }
 }

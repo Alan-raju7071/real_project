@@ -69,30 +69,30 @@ class LoginProvider with ChangeNotifier {
     }
   }
 
-  /// Set loading state
+  
   void _setLoading(bool value) {
     isLoading = value;
     notifyListeners();
   }
 
-  /// Show a snackbar
+  
   void _showSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  /// Clear input controllers
+  
   void clearControllers() {
     emailController.clear();
     passwordController.clear();
   }
 
-  /// Dispose controllers
+  
   void disposeControllers() {
     emailController.dispose();
     passwordController.dispose();
   }
 
-  /// Logout and clear login state
+  
   Future<void> logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 

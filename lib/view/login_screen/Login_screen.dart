@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Title
+                
                 Center(
                   child: Text(
                     TextConstants.loginhead,
@@ -48,11 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Logo
+            
                 const Center(child: Custom_image_container()),
                 const SizedBox(height: 10),
 
-                // Headings
+                
                 Center(
                   child: Column(
                     children: [
@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Email Field
+                
                 Text(TextConstants.email, style: const TextStyle(fontWeight: FontWeight.bold)),
                 CustomTextField(
                   label: "Enter your email address",
@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Password Field
+                
                 Text(TextConstants.password, style: const TextStyle(fontWeight: FontWeight.bold)),
                 CustomTextField(
                   label: "Enter your password",
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Remember Me & Forgot Password
+                
                 Row(
                   children: [
                     Checkbox(
@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Login Button or Loading Indicator
+                
                 loginProvider.isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : InkWell(
@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 20),
 
-                // Register Redirect
+              
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

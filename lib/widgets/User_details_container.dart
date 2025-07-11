@@ -115,30 +115,52 @@ class User_details_container extends StatelessWidget {
                 if (value == null || value.isEmpty) {
                   return 'Please select your date of birth';
                 }
+
+                final regex = RegExp(r'\(Age: (\d+)\)');
+                final match = regex.firstMatch(value);
+                if (match != null) {
+                  final age = int.parse(match.group(1)!);
+                  if (age < 16) {
+                    return 'You must be at least 16 years old';
+                  }
+                } else {
+                  return 'Invalid date format';
+                }
+
                 return null;
               },
             ),
-            const SizedBox(height: 10),
+
+            const SizedBox(height: 16),
             const Text(TextConstants.Gender, style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            DropdownButtonFormField<String>(
-              value: selectedGender,
-              decoration: InputDecoration(
-                labelText: 'Select Gender',
-                labelStyle: TextStyle(color: Colorconstants.primarygrey),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              ),
-              items: ['Male', 'Female', 'Other'].map((gender) {
-                return DropdownMenuItem<String>(
-                  value: gender,
-                  child: Text(gender),
-                );
-              }).toList(),
-              onChanged: onGenderChanged,
-              validator: (value) =>
-                  value == null || value.isEmpty ? 'Please select a gender' : null,
+            const SizedBox(height: 8),
+
+          
+           Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: ['Male', 'Female', 'Other'].map((gender) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Radio<String>(
+            value: gender,
+            groupValue: selectedGender,
+            onChanged: onGenderChanged,
+            visualDensity: VisualDensity.compact,
+          ),
+          Flexible(
+            child: Text(
+              gender,
+              style: const TextStyle(fontSize: 14),
+              overflow: TextOverflow.ellipsis,
             ),
+          ),
+        ],
+      ),
+    );
+  }).toList(),
+),
           ],
         ),
       ),

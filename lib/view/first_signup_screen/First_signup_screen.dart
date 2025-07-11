@@ -1,25 +1,30 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
-import 'package:real_project/view/Second_SignUp_screen/Second_signup_screen.dart';
+import 'package:real_project/view/Interest_screen/Interest_screen.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
+import 'package:real_project/widgets/ProfileImagePicker.dart';
 import 'package:real_project/widgets/User_details_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
 import 'package:real_project/widgets/linear_indicator_with_text.dart';
-import 'package:file_picker/file_picker.dart';
-String formatDateAndAge(DateTime date) {
+
+String? formatDateAndAge(DateTime date) {
   final now = DateTime.now();
   int age = now.year - date.year;
   if (now.month < date.month || (now.month == date.month && now.day < date.day)) {
     age--;
   }
-  return "${DateFormat('dd/MM/yyyy').format(date)} (Age: $age)";
+  return (age >= 16) ? "${DateFormat('dd/MM/yyyy').format(date)} (Age: $age)" : null;
 }
 
 class FirstSignupScreen extends StatefulWidget {
@@ -33,62 +38,133 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
   final int currentStep = 0;
   final List<String> steps = ['Personal Info', 'Interests', 'Verify'];
 
+  final TextEditingController occupationController = TextEditingController();
+  final TextEditingController otherQualificationController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+
+  String city = '', state = '', pincode = '';
   String? selectedGender;
   File? profileImage;
   Uint8List? webImageBytes;
+  String? selectedCountry;
+
+  String? getFinalQualification() {
+    final trimmed = otherQualificationController.text.trim();
+    return trimmed.isNotEmpty ? trimmed : null;
+  }
 
   Future<void> pickImage() async {
     try {
       if (kIsWeb) {
         final result = await FilePicker.platform.pickFiles(type: FileType.image);
         if (result != null && result.files.single.bytes != null) {
+          if (!mounted) return;
           setState(() {
             webImageBytes = result.files.single.bytes!;
             profileImage = null;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Profile image updated")),
-          );
         }
       } else {
         final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
         if (pickedFile != null) {
+          if (!mounted) return;
           setState(() {
             profileImage = File(pickedFile.path);
             webImageBytes = null;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Profile image updated")),
-          );
         }
       }
     } catch (e) {
-      print("Error picking image: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to pick image")),
-      );
+      showMessage("Error picking image: $e");
     }
   }
 
   Future<void> selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime(2000),
-    firstDate: DateTime(1900),
-    lastDate: DateTime.now(),
-  );
-  if (picked != null) {
-    setState(() {
-      dobController.text = formatDateAndAge(picked);
-    });
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      final formatted = formatDateAndAge(picked);
+      if (formatted == null) {
+        showMessage("You must be at least 16 years old");
+        return;
+      }
+      if (!mounted) return;
+      setState(() {
+        dobController.text = formatted;
+      });
+    }
   }
-}
 
+  Future<void> _autofillLocation() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.deniedForever) return;
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse &&
+            permission != LocationPermission.always) {
+          return;
+        }
+      }
+
+      final pos = await Geolocator.getCurrentPosition();
+      final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
+
+      if (placemarks.isNotEmpty) {
+        final p = placemarks.first;
+        city = p.locality ?? '';
+        state = p.administrativeArea ?? '';
+        pincode = p.postalCode ?? '';
+        locationController.text = '$city, $state - $pincode';
+      }
+    } catch (e) {
+      debugPrint("Location Error: $e");
+      showMessage("Failed to detect location. Please try again.");
+    }
+  }
+
+  void showMessage(String message) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(TextConstants.notice),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text(TextConstants.ok),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final localeCountryCode = WidgetsBinding.instance.platformDispatcher.locale.countryCode;
+    final countryMap = {'US': 'USA', 'IN': 'India', 'GB': 'UK'};
+    selectedCountry = countryMap[localeCountryCode] ?? 'USA';
+    Future.microtask(() => _autofillLocation());
+  }
 
   @override
   void dispose() {
     dobController.dispose();
+    occupationController.dispose();
+    otherQualificationController.dispose();
+    addressController.dispose();
+    locationController.dispose();
     super.dispose();
   }
 
@@ -101,59 +177,25 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                TextConstants.signup,
-                style: TextStyle(
-                  color: Colorconstants.primaryblack,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
+              Text(TextConstants.signup,
+                  style: TextStyle(
+                      color: Colorconstants.primaryblack,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18)),
               const SizedBox(height: 24),
               linear_indicator_with_text(steps: steps, currentStep: currentStep),
               const SizedBox(height: 24),
-              const Text(
-                TextConstants.createacc,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              const Text(TextConstants.createacc,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-
               Center(
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey[300],
-                      backgroundImage: webImageBytes != null
-                          ? MemoryImage(webImageBytes!)
-                          : profileImage != null
-                              ? FileImage(profileImage!)
-                              : null,
-                      child: (webImageBytes == null && profileImage == null)
-                          ? const Icon(Icons.person, size: 50, color: Colors.white)
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: InkWell(
-                        onTap: pickImage,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                          ),
-                          child: const Icon(Icons.edit, size: 16, color: Colors.black),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ProfileImagePicker(
+                  webImageBytes: webImageBytes,
+                  fileImage: profileImage,
+                  onPickImage: pickImage,
                 ),
               ),
-
               const SizedBox(height: 24),
-
               User_details_container(
                 dobController: dobController,
                 selectedGender: selectedGender,
@@ -164,123 +206,89 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
                   });
                 },
               ),
-
               const SizedBox(height: 20),
-
-              Material(
-                elevation: 2,
-                shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(TextConstants.country, style: TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 6),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'Country',
-                                    labelStyle: TextStyle(color: Colorconstants.primarygrey),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                                  ),
-                                  items: ['India', 'USA', 'UK'].map((country) {
-                                    return DropdownMenuItem(value: country, child: Text(country));
-                                  }).toList(),
-                                  onChanged: (value) {},
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(TextConstants.state, style: TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 6),
-                                DropdownButtonFormField<String>(
-                                  decoration: InputDecoration(
-                                    labelText: 'State',
-                                    labelStyle: TextStyle(color: Colorconstants.primarygrey),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                                  ),
-                                  items: ['Kerala', 'Maharashtra', 'Delhi'].map((state) {
-                                    return DropdownMenuItem(value: state, child: Text(state));
-                                  }).toList(),
-                                  onChanged: (value) {},
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(TextConstants.city, style: TextStyle(fontWeight: FontWeight.bold)),
-                                CustomTextField(label: "City", labelColor: Colorconstants.primarygrey),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(TextConstants.pincod, style: TextStyle(fontWeight: FontWeight.bold)),
-                                CustomTextField(label: "Pin Code", labelColor: Colorconstants.primarygrey),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+              const Text(TextConstants.locat, style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              TextFormField(
+                controller: locationController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: "Your current location",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
+                validator: (v) => v == null || v.isEmpty ? 'Unavailable' : null,
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _autofillLocation,
+                  child: const Text(
+                    TextConstants.redetet,
+                    style: TextStyle(color: Colorconstants.primaryblue),
                   ),
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              Material(
-                elevation: 2,
-                shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Qualification', style: TextStyle(fontWeight: FontWeight.bold)),
-                      CustomTextField(label: 'Select Qualification', labelColor: Colorconstants.primarygrey),
-                      const SizedBox(height: 16),
-                      const Text('Occupation', style: TextStyle(fontWeight: FontWeight.bold)),
-                      CustomTextField(label: 'Select occupation', labelColor: Colorconstants.primarygrey),
-                      const SizedBox(height: 16),
-                      const Text('Referral Code (Optional)', style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 6),
-                      CustomTextField(label: 'Enter referral code', labelColor: Colorconstants.primarygrey),
-                    ],
-                  ),
+              const SizedBox(height: 12),
+              const Text(TextConstants.addres,
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(
+                  labelText: "Street, Building, etc.",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
               ),
-
+              const SizedBox(height: 20),
+              const Text(TextConstants.qualif, style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: otherQualificationController,
+                decoration: InputDecoration(
+                  labelText: 'Enter or select qualification',
+                  labelStyle: TextStyle(color: Colorconstants.primarygrey),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: occupationController,
+                decoration: InputDecoration(
+                  labelText: 'Enter or select occupation',
+                  labelStyle: TextStyle(color: Colorconstants.primarygrey),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(TextConstants.referal, style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              CustomTextField(
+                label: 'Enter referral code',
+                labelColor: Colorconstants.primarygrey,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: InkWell(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SecondSignupScreen(),));
+                    final finalQualification = getFinalQualification();
+                    if (finalQualification == null) {
+                      showMessage("Please enter your qualification");
+                      return;
+                    }
+                    if (locationController.text.trim().isEmpty) {
+                      showMessage("Please detect your location before continuing");
+                      return;
+                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const InterestsCategoriesWidget()),
+                    );
                   },
                   child: CustomButton(
                     text: TextConstants.continu,

@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 
 import 'package:real_project/contoller/Login_controller.dart';
 import 'package:real_project/contoller/Register_controller.dart';
+import 'package:real_project/view/Interest_screen/Interest_screen.dart';
 import 'package:real_project/view/Splash_screen/Splash_screen.dart';
+import 'package:real_project/view/first_signup_screen/First_signup_screen.dart';
 import 'package:real_project/view/followed_screen/Followed_screen.dart';
 import 'package:real_project/view/login_screen/Login_screen.dart';
 
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       
-      home:  SplashScreen(),
+      home:  FirstSignupScreen(),
     );
   }
 }

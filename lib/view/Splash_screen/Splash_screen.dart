@@ -21,22 +21,33 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateAfterDelay();
   }
 
+  // Future<void> _navigateAfterDelay() async {
+  //   await Future.delayed(const Duration(seconds: 2)); // Show splash for 2 seconds
+
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+  //   if (!mounted) return;
+
+  //   // Navigate based on login state
+  //   Navigator.pushReplacement(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (_) => isLoggedIn ? const FirstSignupScreen() : const LoginScreen(),
+  //     ),
+  //   );
+  // }
   Future<void> _navigateAfterDelay() async {
-    await Future.delayed(const Duration(seconds: 2)); // Show splash for 2 seconds
+  await Future.delayed(const Duration(seconds: 2)); 
 
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  if (!mounted) return;
 
-    if (!mounted) return;
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const FirstSignupScreen()),
+  );
+}
 
-    // Navigate based on login state
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => isLoggedIn ? const FirstSignupScreen() : const LoginScreen(),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -40,7 +40,7 @@ class _FollowScreenState extends State<FollowScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Progress", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text("", style: TextStyle(fontWeight: FontWeight.bold)),
                   Text("$completed/4", style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),

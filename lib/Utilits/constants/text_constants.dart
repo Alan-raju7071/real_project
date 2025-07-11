@@ -56,6 +56,19 @@ class TextConstants {
                          static const String welcpost="Welcom to \nPulse Post!";
                           static const String getstart="To get started, please follow us on \nthe platforms below. this helps you stay \ninformed and get priority in tasks";
                            static const String followabove="please follow all platforms above to unlock access";
+                           static const String progress="Progress";
+                           static const String referal="Referral Code (Optional)";
+                           static const String occupation="Occupation";
+                            static const String qualif="Qualification";
+                            static const String addres="Address (optional details):";
+                            static const String redetet="[ Re-detect Location ]";
+                             static const String locat="Current Location Detected:";
+                              static const String ok="OK";
+                                static const String notice="Notice";
+                                static const String locationerror="Location Error";
+                                 static const String intcat="Interests & Categories";
+                                  static const String verify="Verify";
+                
                 
               
 

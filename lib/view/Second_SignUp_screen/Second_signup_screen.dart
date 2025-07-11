@@ -7,6 +7,7 @@ import 'package:real_project/widgets/User_details_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
 import 'package:real_project/widgets/linear_indicator_with_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 String formatDateAndAge(DateTime date) {
   final now = DateTime.now();
   int age = now.year - date.year;
@@ -17,7 +18,24 @@ String formatDateAndAge(DateTime date) {
 }
 
 class SecondSignupScreen extends StatefulWidget {
-  const SecondSignupScreen({super.key});
+  final String? selectedCountry;
+  final String? selectedState;
+  final String? city;
+  final String? pincode;
+  final String? qualification;
+  final String? occupation;
+  final String? referralCode;
+
+  const SecondSignupScreen({
+    super.key,
+    this.selectedCountry,
+    this.selectedState,
+    this.city,
+    this.pincode,
+    this.qualification,
+    this.occupation,
+    this.referralCode,
+  });
 
   @override
   State<SecondSignupScreen> createState() => _SecondSignupScreenState();
@@ -26,33 +44,39 @@ class SecondSignupScreen extends StatefulWidget {
 class _SecondSignupScreenState extends State<SecondSignupScreen> {
   final int currentStep = 1;
   final List<String> steps = ['Personal Info', 'Interests', 'Verify'];
+
   final TextEditingController dobController = TextEditingController();
   String? selectedGender;
 
   Future<void> _selectDate(BuildContext context) async {
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: DateTime(2000),
-    firstDate: DateTime(1900),
-    lastDate: DateTime.now(),
-  );
-  if (picked != null) {
-    setState(() {
-      dobController.text = formatDateAndAge(picked); // ✅ Put here
-    });
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        dobController.text = formatDateAndAge(picked);
+      });
+    }
   }
-}
-
 
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false); // Clear login state
+    await prefs.setBool('isLoggedIn', false);
 
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
     );
+  }
+
+  @override
+  void dispose() {
+    dobController.dispose();
+    super.dispose();
   }
 
   @override
@@ -83,7 +107,7 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
               ),
               const SizedBox(height: 20),
               linear_indicator_with_text(steps: steps, currentStep: currentStep),
-              const SizedBox(height: 70),
+              const SizedBox(height: 40),
               User_details_container(
                 dobController: dobController,
                 selectedGender: selectedGender,
@@ -100,9 +124,14 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
                 shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
                 child: Container(
                   width: double.infinity,
-                  height: 100,
+                  padding: const EdgeInsets.all(16),
                   color: Colors.grey.shade100,
-                  child: const Center(child: Text("Additional content goes here")),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      
+                    ],
+                  ),
                 ),
               ),
               Padding(
@@ -110,7 +139,6 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
                 child: CustomButton(
                   text: TextConstants.continu,
                   color: Colorconstants.primaryblue,
-                  
                 ),
               ),
             ],
