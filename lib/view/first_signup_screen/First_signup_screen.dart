@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,10 +14,15 @@ import 'package:location/location.dart';
 
 import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
+import 'package:real_project/contoller/Autofillcontriller.dart';
+import 'package:real_project/contoller/SignupController.dart';
 import 'package:real_project/view/Interest_screen/Interest_screen.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
 import 'package:real_project/widgets/ProfileImagePicker.dart';
 import 'package:real_project/widgets/User_details_container.dart';
+
+
+
 import 'package:real_project/widgets/custom_button.dart';
 import 'package:real_project/widgets/linear_indicator_with_text.dart';
 
@@ -38,23 +45,46 @@ class FirstSignupScreen extends StatefulWidget {
 class FirstSignupScreenState extends State<FirstSignupScreen> {
   final int currentStep = 0;
   final List<String> steps = ['Personal Info', 'Interests', 'Verify'];
+  
+List<String> qualificationOptions = [
+  'High School',
+  'Bachelor’s Degree',
+  'Master’s Degree',
+  'PhD',
+  'Diploma',
+  'Other'
+];
+bool showQualificationDropdown = false;
+
 
   final TextEditingController occupationController = TextEditingController();
   final TextEditingController otherQualificationController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
+  final TextEditingController referralCodeController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+final TextEditingController otpController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+final TextEditingController confirmPasswordController = TextEditingController();
 
-  String city = '', state = '', pincode = '';
+
+
+  final _formKey = GlobalKey<FormState>();
+ String city = '', state = '', pincode = '';
   String? selectedGender;
   File? profileImage;
   Uint8List? webImageBytes;
   String? selectedCountry;
+  String? verificationId;
+bool otpSent = false;
+
 
   String? getFinalQualification() {
     final trimmed = otherQualificationController.text.trim();
     return trimmed.isNotEmpty ? trimmed : null;
   }
+  
 
   Future<void> pickImage() async {
     try {
@@ -81,8 +111,7 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
       showMessage("Error picking image: $e");
     }
   }
-
-  Future<void> selectDate(BuildContext context) async {
+Future<void> selectDate(BuildContext context) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime(2000),
@@ -101,95 +130,19 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
       });
     }
   }
-
   Future<void> _autofillLocation() async {
-    if (kIsWeb) {
-      try {
-        
-       
+  final locationText = await AutofillController.autofillLocation();
+  if (!mounted) return;
 
-        html.window.navigator.geolocation.getCurrentPosition().then((pos) async {
-          final lat = pos.coords?.latitude;
-          final lon = pos.coords?.longitude;
-
-          if (lat != null && lon != null) {
-            final response = await http.get(
-              Uri.parse('https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=$lat&lon=$lon'),
-              headers: {'User-Agent': 'FlutterWebApp'},
-            );
-
-            if (response.statusCode == 200) {
-              final data = jsonDecode(response.body);
-              final address = data['address'];
-              setState(() {
-                city = address['city'] ?? address['town'] ?? address['village'] ?? '';
-                state = address['state'] ?? '';
-                pincode = address['postcode'] ?? '';
-                locationController.text = '$city, $state - $pincode';
-              });
-            } else {
-              showMessage("Failed to get location info from server.");
-            }
-          }
-        }).catchError((e) {
-          showMessage("Web geolocation failed: $e");
-        });
-      } catch (e) {
-        showMessage("Web location error: $e");
-      }
-      return;
-    }
-
-    try {
-      final location = Location();
-
-      bool serviceEnabled = await location.serviceEnabled();
-      if (!serviceEnabled) {
-        serviceEnabled = await location.requestService();
-        if (!serviceEnabled) {
-          showMessage("Location services are disabled.");
-          return;
-        }
-      }
-
-      PermissionStatus permissionGranted = await location.hasPermission();
-      if (permissionGranted == PermissionStatus.denied) {
-        permissionGranted = await location.requestPermission();
-        if (permissionGranted != PermissionStatus.granted) {
-          showMessage("Location permission denied.");
-          return;
-        }
-      }
-
-      final locData = await location.getLocation();
-
-      final response = await http.get(
-        Uri.parse(
-          'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${locData.latitude}&lon=${locData.longitude}',
-        ),
-        headers: {'User-Agent': 'FlutterApp'},
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final address = data['address'];
-
-        setState(() {
-          city = address['city'] ?? address['town'] ?? address['village'] ?? '';
-          state = address['state'] ?? '';
-          pincode = address['postcode'] ?? '';
-          locationController.text = '$city, $state - $pincode';
-        });
-      } else {
-        showMessage("Failed to get location info from server.");
-      }
-    } catch (e) {
-      debugPrint("Location Error: $e");
-      showMessage("Failed to detect location. Please try again.");
-    }
+  if (locationText != null && locationText.isNotEmpty) {
+    setState(() {
+      locationController.text = locationText;
+    });
+  } else {
+    showMessage("Failed to detect location. Please try again.");
   }
-
-  void showMessage(String message) {
+}
+void showMessage(String message) {
     if (!mounted) return;
     showDialog(
       context: context,
@@ -212,8 +165,7 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
     final localeCountryCode = WidgetsBinding.instance.platformDispatcher.locale.countryCode;
     final countryMap = {'US': 'USA', 'IN': 'India', 'GB': 'UK'};
     selectedCountry = countryMap[localeCountryCode] ?? 'USA';
-    Future.microtask(() => _autofillLocation());
-  }
+    }
 
   @override
   void dispose() {
@@ -222,7 +174,13 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
     otherQualificationController.dispose();
     addressController.dispose();
     locationController.dispose();
+    referralCodeController.dispose();
+    passwordController.dispose(); 
+  confirmPasswordController.dispose(); 
     super.dispose();
+    mobileController.dispose();
+otpController.dispose();
+
   }
 
   @override
@@ -231,127 +189,283 @@ class FirstSignupScreenState extends State<FirstSignupScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(TextConstants.signup,
-                  style: TextStyle(
-                      color: Colorconstants.primaryblack,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18)),
-              const SizedBox(height: 24),
-              linear_indicator_with_text(steps: steps, currentStep: currentStep),
-              const SizedBox(height: 24),
-              const Text(TextConstants.createacc,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              Center(
-                child: ProfileImagePicker(
-                  webImageBytes: webImageBytes,
-                  fileImage: profileImage,
-                  onPickImage: pickImage,
+          child: Form(
+             key: _formKey,
+   autovalidateMode: AutovalidateMode.disabled,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(TextConstants.signup,
+                    style: TextStyle(
+                        color: Colorconstants.primaryblack,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18)),
+                const SizedBox(height: 24),
+                linear_indicator_with_text(steps: steps, currentStep: currentStep),
+                const SizedBox(height: 24),
+                const Text(TextConstants.createacc,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                
+
+                Center(
+                  child: ProfileImagePicker(
+                    webImageBytes: webImageBytes,
+                    fileImage: profileImage,
+                    onPickImage: pickImage,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              User_details_container(
-                dobController: dobController,
-                selectedGender: selectedGender,
-                onDateTap: () => selectDate(context),
-                onGenderChanged: (value) {
+                const SizedBox(height: 24),
+               User_details_container(
+  dobController: dobController,
+  selectedGender: selectedGender,
+  onDateTap: () => selectDate(context),
+  onGenderChanged: (value) {
+    setState(() {
+      selectedGender = value;
+    });
+  },
+  mobileController: mobileController,
+  otpController: otpController,
+  onSendOtp: () {
+    showMessage("Send OTP to ${mobileController.text.trim()}");
+  },
+),
+
+                const SizedBox(height: 20),
+                const Text(TextConstants.locat, style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: locationController,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: "Your current location",
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  ),
+                  validator: (v) => v == null || v.isEmpty ? 'Unavailable' : null,
+                ),
+              Row(
+  mainAxisAlignment: MainAxisAlignment.end,
+  children: [
+    TextButton(
+      onPressed: _autofillLocation,
+      child: const Text(
+        'Re-detect',
+        style: TextStyle(color: Colorconstants.primaryblue),
+      ),
+    ),
+    const SizedBox(width: 8),
+    ElevatedButton.icon(
+      onPressed: _autofillLocation,
+      icon: const Icon(Icons.my_location, size: 18),
+      label: const Text("Detect Location"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colorconstants.primaryblue,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        textStyle: const TextStyle(fontSize: 14),
+      ),
+    ),
+  ],
+),
+
+                const SizedBox(height: 12),
+                const Text(TextConstants.addres,
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: addressController,
+                  decoration: InputDecoration(
+                    labelText: "Street, Building, etc.",
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    
+                  ),
+                  validator: (value) => value == null || value.trim().isEmpty ? 'Please enter your address' : null,
+                  
+                  
+                ),
+                
+                const SizedBox(height: 20),
+                const Text(TextConstants.qualif, style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+            
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+  controller: otherQualificationController,
+  readOnly: true,
+  decoration: InputDecoration(
+    labelText: 'Enter or select qualification',
+    labelStyle: TextStyle(color: Colorconstants.primarygrey),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    suffixIcon: const Icon(Icons.arrow_drop_down),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  ),
+  validator: (value) => value == null || value.trim().isEmpty ? 'Please select qualification' : null,
+  onTap: () {
+    setState(() {
+      showQualificationDropdown = !showQualificationDropdown;
+    });
+  },
+),
+
+                if (showQualificationDropdown)
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    decoration: BoxDecoration(
+            border: Border.all(color: Colorconstants.primarygrey),
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+                    ),
+                    child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: qualificationOptions.length,
+            itemBuilder: (context, index) {
+              final option = qualificationOptions[index];
+              return ListTile(
+                title: Text(option),
+                onTap: () {
                   setState(() {
-                    selectedGender = value;
+                    otherQualificationController.text = option;
+                    showQualificationDropdown = false;
                   });
                 },
-              ),
-              const SizedBox(height: 20),
-              const Text(TextConstants.locat, style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: locationController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: "Your current location",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              );
+            },
+                    ),
+                  ),
+              ],
+            ),
+          const SizedBox(height: 16),
+                TextFormField(
+  controller: occupationController,
+  decoration: InputDecoration(
+    labelText: 'Enter or select occupation',
+    labelStyle: TextStyle(color: Colorconstants.primarygrey),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  ),
+  validator: (value) => value == null || value.trim().isEmpty ? 'Please enter occupation' : null,
+),
+const SizedBox(height: 16),
+                const Text(TextConstants.referal, style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                CustomTextField(
+                  label: 'Enter referral code',
+                  labelColor: Colorconstants.primarygrey,
                 ),
-                validator: (v) => v == null || v.isEmpty ? 'Unavailable' : null,
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _autofillLocation,
-                  child: const Text(
-                    TextConstants.redetet,
-                    style: TextStyle(color: Colorconstants.primaryblue),
+                const SizedBox(height: 16),
+const Text("Password", style: TextStyle(fontWeight: FontWeight.bold)),
+const SizedBox(height: 6),
+TextFormField(
+  controller: passwordController,
+  obscureText: true,
+  decoration: InputDecoration(
+    labelText: "Enter password",
+    labelStyle: TextStyle(color: Colorconstants.primarygrey),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'Please enter a password';
+    if (value.length < 6) return 'Password must be at least 6 characters';
+    return null;
+  },
+),
+
+const SizedBox(height: 16),
+const Text("Confirm Password", style: TextStyle(fontWeight: FontWeight.bold)),
+const SizedBox(height: 6),
+TextFormField(
+  controller: confirmPasswordController,
+  obscureText: true,
+  decoration: InputDecoration(
+    labelText: "Re-enter password",
+    labelStyle: TextStyle(color: Colorconstants.primarygrey),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'Please confirm your password';
+    if (value != passwordController.text) return 'Passwords do not match';
+    return null;
+  },
+),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: InkWell(
+              onTap: () async {
+  if (_formKey.currentState?.validate() ?? false) {
+    if (selectedGender == null || selectedGender!.isEmpty) {
+      showMessage("Please select your gender");
+      return;
+    }
+if (dobController.text.trim().isEmpty) {
+      showMessage("Please select your date of birth");
+      return;
+    }
+final imageUrl = await SignupController.uploadProfileImage(
+      fileImage: profileImage,
+      webImageBytes: webImageBytes,
+    );
+final success = await SignupController.saveUserData(
+      dob: dobController.text.trim(),
+      gender: selectedGender!,
+      location: locationController.text.trim(),
+      address: addressController.text.trim(),
+      qualification: otherQualificationController.text.trim(),
+      occupation: occupationController.text.trim(),
+      referralCode: referralCodeController.text.trim(),
+      imageUrl: imageUrl,
+      password: passwordController.text.trim(),
+    );
+if (success) {
+      showMessage("Signup data saved successfully!");
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const InterestsCategoriesWidget()),
+      );
+    } else {
+      showMessage("Failed to save your data. Please try again.");
+    }
+    
+if (verificationId == null) {
+  showMessage("Please request an OTP first.");
+  return;
+}
+
+if (otpController.text.trim().length != 6) {
+  showMessage("Please enter a valid 6-digit OTP.");
+  return;
+}
+
+try {
+  final credential = PhoneAuthProvider.credential(
+    verificationId: verificationId!,
+    smsCode: otpController.text.trim(),
+  );
+
+  await FirebaseAuth.instance.signInWithCredential(credential);
+} catch (e) {
+  showMessage("Invalid OTP. Please try again.");
+  return;
+}
+
+  }
+},
+ child: CustomButton(
+                      text: TextConstants.continu,
+                      color: Colorconstants.primaryblue,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              const Text(TextConstants.addres,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              TextField(
-                controller: addressController,
-                decoration: InputDecoration(
-                  labelText: "Street, Building, etc.",
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(TextConstants.qualif, style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: otherQualificationController,
-                decoration: InputDecoration(
-                  labelText: 'Enter or select qualification',
-                  labelStyle: TextStyle(color: Colorconstants.primarygrey),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: occupationController,
-                decoration: InputDecoration(
-                  labelText: 'Enter or select occupation',
-                  labelStyle: TextStyle(color: Colorconstants.primarygrey),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(TextConstants.referal, style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              CustomTextField(
-                label: 'Enter referral code',
-                labelColor: Colorconstants.primarygrey,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: InkWell(
-                  onTap: () {
-                    final finalQualification = getFinalQualification();
-                    if (finalQualification == null) {
-                      showMessage("Please enter your qualification");
-                      return;
-                    }
-                    if (locationController.text.trim().isEmpty) {
-                      showMessage("Please detect your location before continuing");
-                      return;
-                    }
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const InterestsCategoriesWidget()),
-                    );
-                  },
-                  child: CustomButton(
-                    text: TextConstants.continu,
-                    color: Colorconstants.primaryblue,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

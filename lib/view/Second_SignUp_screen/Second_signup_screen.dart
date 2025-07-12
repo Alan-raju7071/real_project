@@ -45,8 +45,13 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
   final int currentStep = 1;
   final List<String> steps = ['Personal Info', 'Interests', 'Verify'];
 
+
   final TextEditingController dobController = TextEditingController();
-  String? selectedGender;
+final TextEditingController mobileController = TextEditingController();
+final TextEditingController otpController = TextEditingController();
+String? selectedGender;
+
+  
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -74,10 +79,13 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
   }
 
   @override
-  void dispose() {
-    dobController.dispose();
-    super.dispose();
-  }
+void dispose() {
+  dobController.dispose();
+  mobileController.dispose();
+  otpController.dispose();
+  super.dispose();
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -108,16 +116,23 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
               const SizedBox(height: 20),
               linear_indicator_with_text(steps: steps, currentStep: currentStep),
               const SizedBox(height: 40),
-              User_details_container(
-                dobController: dobController,
-                selectedGender: selectedGender,
-                onDateTap: () => _selectDate(context),
-                onGenderChanged: (value) {
-                  setState(() {
-                    selectedGender = value;
-                  });
-                },
-              ),
+             User_details_container(
+  dobController: dobController,
+  selectedGender: selectedGender,
+  onDateTap: () => _selectDate(context),
+
+  onGenderChanged: (value) {
+    setState(() {
+      selectedGender = value;
+    });
+  },
+  mobileController: mobileController,
+  otpController: otpController,
+  onSendOtp: () {
+    
+  },
+),
+
               const SizedBox(height: 20),
               Material(
                 elevation: 2,
