@@ -84,6 +84,27 @@ bool otpSent = false;
     final trimmed = otherQualificationController.text.trim();
     return trimmed.isNotEmpty ? trimmed : null;
   }
+  void sendOtp() async {
+  await FirebaseAuth.instance.verifyPhoneNumber(
+    phoneNumber: "+91${mobileController.text.trim()}",
+    verificationCompleted: (PhoneAuthCredential credential) {},
+    verificationFailed: (FirebaseAuthException e) {
+      showMessage("OTP sending failed: ${e.message}");
+    },
+    codeSent: (String verId, int? resendToken) {
+      setState(() {
+        verificationId = verId;
+        otpSent = true;
+      });
+      showMessage("OTP has been sent to your number.");
+    },
+    codeAutoRetrievalTimeout: (String verId) {
+      verificationId = verId;
+    },
+    timeout: const Duration(seconds: 60),
+  );
+}
+
   
 
   Future<void> pickImage() async {
@@ -227,8 +248,8 @@ otpController.dispose();
   },
   mobileController: mobileController,
   otpController: otpController,
-  onSendOtp: () {
-    showMessage("Send OTP to ${mobileController.text.trim()}");
+ onSendOtp: () {
+    sendOtp(); 
   },
 ),
 
@@ -399,21 +420,46 @@ TextFormField(
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: InkWell(
-              onTap: () async {
+           onTap: () async {
   if (_formKey.currentState?.validate() ?? false) {
     if (selectedGender == null || selectedGender!.isEmpty) {
       showMessage("Please select your gender");
       return;
     }
-if (dobController.text.trim().isEmpty) {
+    if (dobController.text.trim().isEmpty) {
       showMessage("Please select your date of birth");
       return;
     }
-final imageUrl = await SignupController.uploadProfileImage(
+
+    if (verificationId == null) {
+      showMessage("Please request an OTP first.");
+      return;
+    }
+
+    if (otpController.text.trim().length != 6) {
+      showMessage("Please enter a valid 6-digit OTP.");
+      return;
+    }
+
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationId!,
+        smsCode: otpController.text.trim(),
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      showMessage("Invalid OTP. Please try again.");
+      return;
+    }
+
+    // If OTP is valid, proceed to image upload and saving user data
+    final imageUrl = await SignupController.uploadProfileImage(
       fileImage: profileImage,
       webImageBytes: webImageBytes,
     );
-final success = await SignupController.saveUserData(
+
+    final success = await SignupController.saveUserData(
       dob: dobController.text.trim(),
       gender: selectedGender!,
       location: locationController.text.trim(),
@@ -424,7 +470,8 @@ final success = await SignupController.saveUserData(
       imageUrl: imageUrl,
       password: passwordController.text.trim(),
     );
-if (success) {
+
+    if (success) {
       showMessage("Signup data saved successfully!");
       Navigator.push(
         context,
@@ -433,31 +480,9 @@ if (success) {
     } else {
       showMessage("Failed to save your data. Please try again.");
     }
-    
-if (verificationId == null) {
-  showMessage("Please request an OTP first.");
-  return;
-}
-
-if (otpController.text.trim().length != 6) {
-  showMessage("Please enter a valid 6-digit OTP.");
-  return;
-}
-
-try {
-  final credential = PhoneAuthProvider.credential(
-    verificationId: verificationId!,
-    smsCode: otpController.text.trim(),
-  );
-
-  await FirebaseAuth.instance.signInWithCredential(credential);
-} catch (e) {
-  showMessage("Invalid OTP. Please try again.");
-  return;
-}
-
   }
 },
+
  child: CustomButton(
                       text: TextConstants.continu,
                       color: Colorconstants.primaryblue,
