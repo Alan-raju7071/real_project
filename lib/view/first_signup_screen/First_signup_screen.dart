@@ -67,6 +67,8 @@ bool showQualificationDropdown = false;
 final TextEditingController otpController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 final TextEditingController confirmPasswordController = TextEditingController();
+final TextEditingController emailController = TextEditingController();
+
 
 
 
@@ -237,8 +239,9 @@ otpController.dispose();
                   ),
                 ),
                 const SizedBox(height: 24),
-               User_details_container(
+            User_details_container(
   dobController: dobController,
+  emailController: emailController, 
   selectedGender: selectedGender,
   onDateTap: () => selectDate(context),
   onGenderChanged: (value) {
@@ -248,10 +251,11 @@ otpController.dispose();
   },
   mobileController: mobileController,
   otpController: otpController,
- onSendOtp: () {
-    sendOtp(); 
+  onSendOtp: () {
+    sendOtp();
   },
 ),
+
 
                 const SizedBox(height: 20),
                 const Text(TextConstants.locat, style: TextStyle(fontWeight: FontWeight.bold)),
@@ -309,59 +313,74 @@ otpController.dispose();
                   
                 ),
                 
-                const SizedBox(height: 20),
-                const Text(TextConstants.qualif, style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+                
+                
+                
             
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFormField(
-  controller: otherQualificationController,
-  readOnly: true,
-  decoration: InputDecoration(
-    labelText: 'Enter or select qualification',
-    labelStyle: TextStyle(color: Colorconstants.primarygrey),
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-    suffixIcon: const Icon(Icons.arrow_drop_down),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-  ),
-  validator: (value) => value == null || value.trim().isEmpty ? 'Please select qualification' : null,
-  onTap: () {
-    setState(() {
-      showQualificationDropdown = !showQualificationDropdown;
-    });
-  },
+               const SizedBox(height: 20),
+const Text(TextConstants.qualif, style: TextStyle(fontWeight: FontWeight.bold)),
+const SizedBox(height: 8),
+Stack(
+  alignment: Alignment.centerRight,
+  children: [
+    TextFormField(
+      controller: otherQualificationController,
+      decoration: InputDecoration(
+        labelText: 'Enter or select qualification',
+        labelStyle: TextStyle(color: Colorconstants.primarygrey),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      ),
+      validator: (value) => value == null || value.trim().isEmpty
+          ? 'Please enter qualification'
+          : null,
+    ),
+    IconButton(
+      icon: const Icon(Icons.arrow_drop_down),
+      onPressed: () {
+        setState(() {
+          showQualificationDropdown = !showQualificationDropdown;
+        });
+      },
+    ),
+  ],
 ),
+if (showQualificationDropdown)
+  Container(
+    margin: const EdgeInsets.only(top: 4),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colorconstants.primarygrey),
+      borderRadius: BorderRadius.circular(8),
+      color: Colors.white,
+    ),
+    child: ListView.builder(
+      shrinkWrap: true,
+      itemCount: qualificationOptions.length,
+      itemBuilder: (context, index) {
+        final option = qualificationOptions[index];
+        return ListTile(
+          title: Text(option),
+          onTap: () {
+            setState(() {
+              otherQualificationController.text = option;
+              showQualificationDropdown = false;
+            });
+          },
+        );
+      },
+    ),
+  ),
 
-                if (showQualificationDropdown)
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    decoration: BoxDecoration(
-            border: Border.all(color: Colorconstants.primarygrey),
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
-                    ),
-                    child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: qualificationOptions.length,
-            itemBuilder: (context, index) {
-              final option = qualificationOptions[index];
-              return ListTile(
-                title: Text(option),
-                onTap: () {
-                  setState(() {
-                    otherQualificationController.text = option;
-                    showQualificationDropdown = false;
-                  });
-                },
-              );
-            },
-                    ),
-                  ),
+
+               
               ],
             ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 20),
+                const Text(TextConstants.occupation, style: TextStyle(fontWeight: FontWeight.bold)),
+          
                 TextFormField(
   controller: occupationController,
   decoration: InputDecoration(
@@ -461,6 +480,7 @@ TextFormField(
 
     final success = await SignupController.saveUserData(
       dob: dobController.text.trim(),
+      email: emailController.text.trim(),
       gender: selectedGender!,
       location: locationController.text.trim(),
       address: addressController.text.trim(),

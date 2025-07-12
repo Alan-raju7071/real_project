@@ -5,6 +5,7 @@ import 'package:real_project/widgets/Custom_Textfield.dart';
 
 class User_details_container extends StatelessWidget {
   final TextEditingController dobController;
+   final TextEditingController emailController;
   final String? selectedGender;
   final void Function()? onDateTap;
   final void Function(String?)? onGenderChanged;
@@ -15,6 +16,7 @@ class User_details_container extends StatelessWidget {
   const User_details_container({
     super.key,
     required this.dobController,
+     required this.emailController,
     required this.selectedGender,
     required this.mobileController,
     required this.otpController,
@@ -48,20 +50,25 @@ class User_details_container extends StatelessWidget {
             const SizedBox(height: 10),
 
             const Text(TextConstants.email, style: TextStyle(fontWeight: FontWeight.bold)),
-            CustomTextField(
-              label: "Enter your email address",
-              labelColor: Colorconstants.primarygrey,
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                  return 'Enter a valid email address';
-                }
-                return null;
-              },
-            ),
+          
+const SizedBox(height: 6),
+TextFormField(
+  controller: emailController,
+  keyboardType: TextInputType.emailAddress,
+  decoration: InputDecoration(
+    labelText: "Enter your email",
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) return 'Please enter your email';
+    if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  },
+),
+
             const SizedBox(height: 16),
 
             const Text(TextConstants.mobilenumber, style: TextStyle(fontWeight: FontWeight.bold)),

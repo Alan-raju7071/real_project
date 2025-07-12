@@ -4,6 +4,7 @@ import 'package:real_project/Utilits/constants/colorconstant.dart';
 import 'package:real_project/Utilits/constants/text_constants.dart';
 import 'package:real_project/view/Forgot_password/Forgot_password.dart';
 import 'package:real_project/view/Register_screen/Register_screen.dart';
+import 'package:real_project/view/first_signup_screen/First_signup_screen.dart';
 import 'package:real_project/widgets/Custom_Textfield.dart';
 import 'package:real_project/widgets/Custom_image_container.dart';
 import 'package:real_project/widgets/custom_button.dart';
@@ -179,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                          MaterialPageRoute(builder: (_) => const FirstSignupScreen()),
                         );
                       },
                       child: Text(

@@ -13,6 +13,9 @@ class InterestsCategoriesWidget extends StatefulWidget {
 }
 
 class _InterestsCategoriesWidgetState extends State<InterestsCategoriesWidget> {
+  final TextEditingController customInterestController = TextEditingController();
+final List<String> customInterests = [];
+
   final Map<String, List<String>> interestCategories = {
     'Education': [
       'NIOS',
@@ -112,6 +115,17 @@ class _InterestsCategoriesWidgetState extends State<InterestsCategoriesWidget> {
   };
 
   final Set<String> selectedInterests = {};
+  void _addCustomInterest() {
+  final text = customInterestController.text.trim();
+  if (text.isNotEmpty && !selectedInterests.contains(text)) {
+    setState(() {
+      selectedInterests.add(text);
+      customInterests.add(text);
+      customInterestController.clear();
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +135,51 @@ class _InterestsCategoriesWidgetState extends State<InterestsCategoriesWidget> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            TextField(
+  controller: customInterestController,
+  decoration: InputDecoration(
+    labelText: 'Add Custom Interest',
+    suffixIcon: IconButton(
+      icon: const Icon(Icons.add),
+      onPressed: _addCustomInterest,
+    ),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+  ),
+),
+if (customInterests.isNotEmpty)
+  Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: customInterests.map((item) {
+      final isSelected = selectedInterests.contains(item);
+      return ChoiceChip(
+        label: Text(item),
+        selected: isSelected,
+        onSelected: (bool selected) {
+          setState(() {
+            if (selected) {
+              selectedInterests.add(item);
+            } else {
+              selectedInterests.remove(item);
+            }
+          });
+        },
+        selectedColor: Colorconstants.primarygrey,
+        backgroundColor: Colorconstants.grey300,
+        labelStyle: TextStyle(
+          color: isSelected
+              ? Colorconstants.primaryblue
+              : Colorconstants.primaryblack,
+        ),
+      );
+    }).toList(),
+  ),
+const SizedBox(height: 24),
+
+const SizedBox(height: 16),
+
             Expanded(
               child: ListView(
                 children: interestCategories.entries.map((entry) {

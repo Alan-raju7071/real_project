@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
@@ -34,36 +35,44 @@ class SignupController {
   }
 
   static Future<bool> saveUserData({
-    required String dob,
-    required String gender,
-    required String location,
-    required String address,
-    required String qualification,
-    required String occupation,
-    required String referralCode,
-    required String password,
+  required String email,           
+  required String password,
+  required String dob,
+  required String gender,
+  required String location,
+  required String address,
+  required String qualification,
+  required String occupation,
+  required String referralCode,
+  String? imageUrl,
+}) async {
+  try {
     
-    String? imageUrl,
-  }) async {
-    try {
-      final userData = {
-        'dob': dob,
-        'gender': gender,
-        'location': location,
-        'address': address,
-        'qualification': qualification,
-        'occupation': occupation,
-        'referralCode': referralCode,
-        'profileImage': imageUrl,
-        'password': password,
-        'timestamp': FieldValue.serverTimestamp(),
-      };
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
 
-      await FirebaseFirestore.instance.collection('users').add(userData);
-      return true;
-    } catch (e) {
-      debugPrint("Error saving user data: $e");
-      return false;
-    }
+    
+    final userData = {
+      'email': email,
+      'dob': dob,
+      'gender': gender,
+      'location': location,
+      'address': address,
+      'qualification': qualification,
+      'occupation': occupation,
+      'referralCode': referralCode,
+      'profileImage': imageUrl,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    await FirebaseFirestore.instance.collection('users').doc(email).set(userData);
+    return true;
+  } catch (e) {
+    debugPrint("Error saving user data: $e");
+    return false;
   }
+}
+
 }

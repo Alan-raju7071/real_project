@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:real_project/view/Homescreen/Homescreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:real_project/view/login_screen/Login_screen.dart';
 import 'package:real_project/view/first_signup_screen/First_signup_screen.dart';
@@ -21,33 +22,22 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateAfterDelay();
   }
 
-  // Future<void> _navigateAfterDelay() async {
-  //   await Future.delayed(const Duration(seconds: 2)); // Show splash for 2 seconds
-
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-
-  //   if (!mounted) return;
-
-  //   // Navigate based on login state
-  //   Navigator.pushReplacement(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (_) => isLoggedIn ? const FirstSignupScreen() : const LoginScreen(),
-  //     ),
-  //   );
-  // }
   Future<void> _navigateAfterDelay() async {
-  await Future.delayed(const Duration(seconds: 2)); 
+    await Future.delayed(const Duration(seconds: 3)); 
 
-  if (!mounted) return;
+    final prefs = await SharedPreferences.getInstance();
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (_) => const FirstSignupScreen()),
-  );
-}
+    if (!mounted) return;
 
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => isLoggedIn ? const Homescreen() : const LoginScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,4 +72,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-}
+} 

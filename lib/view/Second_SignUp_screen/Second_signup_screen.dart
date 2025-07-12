@@ -49,6 +49,7 @@ class _SecondSignupScreenState extends State<SecondSignupScreen> {
   final TextEditingController dobController = TextEditingController();
 final TextEditingController mobileController = TextEditingController();
 final TextEditingController otpController = TextEditingController();
+final TextEditingController emailController=TextEditingController();
 String? selectedGender;
 
   
@@ -117,6 +118,7 @@ void dispose() {
               linear_indicator_with_text(steps: steps, currentStep: currentStep),
               const SizedBox(height: 40),
              User_details_container(
+              emailController: emailController, 
   dobController: dobController,
   selectedGender: selectedGender,
   onDateTap: () => _selectDate(context),
