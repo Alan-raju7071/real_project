@@ -68,6 +68,9 @@ class TextConstants {
                                 static const String locationerror="Location Error";
                                  static const String intcat="Interests & Categories";
                                   static const String verify="Verify";
+                                  static const String mobile="Login with Mobile & OTP";
+                                  static const String em="Login with Email & Password";
+                                  static const String oTP=" OTP";
                 
                 
               
