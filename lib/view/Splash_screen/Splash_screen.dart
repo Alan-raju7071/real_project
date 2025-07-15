@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:real_project/view/Homescreen/Homescreen.dart';
+import 'package:real_project/view/Dashboaerd_Homescreen/Dashboaerd_Homescreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:real_project/view/login_screen/Login_screen.dart';
 import 'package:real_project/view/first_signup_screen/First_signup_screen.dart';
@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => isLoggedIn ? const Homescreen() : const LoginScreen(),
+        builder: (_) => isLoggedIn ? const Dashboaerd_Homescreen() : const LoginScreen(),
       ),
     );
   }
