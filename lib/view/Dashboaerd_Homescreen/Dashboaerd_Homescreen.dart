@@ -18,13 +18,83 @@ class Dashboaerd_Homescreen extends StatefulWidget {
 }
 
 class _Dashboaerd_HomescreenState extends State<Dashboaerd_Homescreen> {
+  String selectedLocation = 'Ernakulam';
+
+List<Map<String, String>> locationBasedBanners = [];
+
+final Map<String, List<Map<String, String>>> locationBannerMap = {
+  'Ernakulam': [
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDxUlhDCrv9RmGFNVME75myxRdtkI_pfCLww&s",//
+      "url": "https://www.instagram.com/p/C1B-SuCv6nv/"
+    },
+    {
+      "image": "https://static.helioswatchstore.com/media/magespacex/storepickup/images/store/gallery/h/l/hlks_1.jpg",//
+      "url": "https://www.helioswatchstore.com/store-locator/kochi/watch-store-in-lulu-mall"
+    },
+
+     {
+      "image": "https://app.clicoffer.com/uploads/flyers/71779/Bakrid_LuLu-Kochi-4_thumb.webp",
+      "url": "https://www.clicoffer.com/en/india/ernakulam/offers/lulu-hypermarket-11#google_vignette" //
+    },
+     {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/82/Forum_Mall%2C_Kochi.jpg",//
+      "url": "https://en.wikipedia.org/wiki/Forum_Mall_Kochi"
+    },
+  ],
+  'Palakkad': [
+    {
+      "image": "https://i.ytimg.com/vi/291RJEuF6uo/hqdefault.jpg",//4
+      "url": "https://www.youtube.com/watch?v=291RJEuF6uo"
+    },
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIC9dw3jWizOA0d0c-9mvJ-aKczHGcNtVIzQ&s",//work
+      "url": "https://www.facebook.com/easybuyindia.official/posts/hello-palakkad-we-are-open-and-we-are-excitedcome-and-experience-keralas-favorit/3178766095525217/"//
+    },
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE15jOLxl2UxkcJk5occyLqdua9M4NeDR7tQ&s",
+      "url": "https://www.instagram.com/p/C-AiXv3tFaH/"//work
+    },
+    {
+      "image": "https://i.ytimg.com/vi/tMTe6J8SY40/sddefault.jpg",
+      "url": "https://www.youtube.com/watch?v=tMTe6J8SY40"//work
+    },
+  ],
+  'Thrissur': [
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyCRHgxxAphRHUNuSrXigacnv6b3knI4PLXg&s",//work
+      "url": "https://www.facebook.com/THRISSUROFFERS/"
+    },
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR8wWSVDyE8vUABEBny-jhqC96cWyFBWOcSA&s",//work
+      "url": "https://www.instagram.com/p/DDRlIT_i_rO/"
+    },
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCZpJoG1_qAH-vfDwkBzOjZwtErQfvnOBS_Q&s",
+      "url": "https://www.facebook.com/TSF2020HAPPYDAYS/"
+    },
+    {
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUcTWM_5Seo4hGnHfR26N3Qy3FPccd7g9W8Q&s",
+      "url": "https://www.thrissuroffers.com/deal/best-optical-shop-in-thrissur.html"
+    },
+  ],
+};
+
   String? userName;
 
   @override
-  void initState() {
-    super.initState();
-    fetchUserName();
-  }
+void initState() {
+  super.initState();
+  fetchUserName();
+  updateLocationBanners(selectedLocation);
+}
+
+void updateLocationBanners(String location) {
+  setState(() {
+    locationBasedBanners = locationBannerMap[location] ?? [];
+  });
+}
+
   Future<void> _launchURL(String url) async {
   final Uri uri = Uri.parse(url);
   if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -87,19 +157,7 @@ class _Dashboaerd_HomescreenState extends State<Dashboaerd_Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> bannerImages = [
-  {"image": ImageConstants.ziyalogo1, "url": "https://www.ziyaacademy.co.in/assets/images/Ziya_Academy_Path_to_Success.png"},
-  {"image": ImageConstants.ziyalogo2, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADVvka688dohfIdgNPFf2Szfw8-7MjYWPmQ&s"},
-  {"image": ImageConstants.ziyalogo3, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-k2ZC2FKoVT47gc8TBZiX5n0T4kJj2II9lw&s"},
-  {"image": ImageConstants.ziyalogo4, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFJshYPwOJtRHZ6GsMrKkE53NP48_oLx33cA&s"},
-];
-
-List<Map<String, String>> bottombaner = [
-  {"image": ImageConstants.ziyalogobottom1, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzbPiniWXteFtK9_PIcsJFw9UMZgieIWs1aBtPtrkoElwo4ZT3u9024fgs7CXdA1g7ERE&usqp=CAU"},
-  {"image": ImageConstants.ziyalogobottom2, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2i4xjgfo4XvfNUWJJ83Boh9qCzwguhJczWQ&s"},
-  {"image": ImageConstants.ziyalogobottom3, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQudBKrM7BpKMZZZyyCkFd5clOHKsCkH3GX6Q&s"},
-  {"image": ImageConstants.ziyalogobottom4, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR35l0GmK7otFHlAInmIlGrkGAxR71cQRkfUg&s"},
-];
+   
 
 
     return Scaffold(
@@ -120,17 +178,39 @@ List<Map<String, String>> bottombaner = [
         child: Column(
           children: [
             const SizedBox(height: 30),
+            Padding(
+  padding: const EdgeInsets.only(bottom: 12.0),
+  child: DropdownButton<String>(
+    value: selectedLocation,
+    onChanged: (String? newValue) {
+      if (newValue != null) {
+        setState(() {
+          selectedLocation = newValue;
+          updateLocationBanners(newValue);
+        });
+      }
+    },
+    items: locationBannerMap.keys.map((String location) {
+      return DropdownMenuItem<String>(
+        value: location,
+        child: Text(location),
+      );
+    }).toList(),
+  ),
+),
+
             
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: CarouselSlider(
+                
   options: CarouselOptions(
     height: MediaQuery.of(context).size.height * 0.25,
     autoPlay: true,
     enlargeCenterPage: true,
     viewportFraction: 0.9,
   ),
-  items: bannerImages.map((banner) {
+  items: locationBasedBanners.map((banner) {
     return Builder(
       builder: (BuildContext context) {
         return ClipRRect(
@@ -261,7 +341,7 @@ List<Map<String, String>> bottombaner = [
     enlargeCenterPage: true,
     viewportFraction: 0.9,
   ),
-  items: bottombaner.map((banner) {
+  items: locationBasedBanners.map((banner) {
     return Builder(
       builder: (BuildContext context) {
         return ClipRRect(
