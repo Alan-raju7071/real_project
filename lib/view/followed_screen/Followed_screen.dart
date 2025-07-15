@@ -5,6 +5,7 @@ import 'package:real_project/Utilits/constants/text_constants.dart';
 import 'package:real_project/view/Splash_screen/Splash_screen.dart';
 import 'package:real_project/widgets/Custom_image_container.dart';
 import 'package:real_project/widgets/FollowCard.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class FollowScreen extends StatefulWidget {
@@ -15,6 +16,13 @@ class FollowScreen extends StatefulWidget {
 }
 
 class _FollowScreenState extends State<FollowScreen> {
+  Future<void> _launchURL(String url) async {
+  final Uri uri = Uri.parse(url);
+  if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+    throw Exception('Could not launch $url');
+  }
+}
+
   List<bool> followed = [false, false, false, false];
 
   @override
@@ -40,7 +48,7 @@ class _FollowScreenState extends State<FollowScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text("progress", style: TextStyle(fontWeight: FontWeight.bold)),
                   Text("$completed/4", style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
@@ -62,26 +70,30 @@ class _FollowScreenState extends State<FollowScreen> {
                     followedsstext: TextConstants.followedtext,
                     imageUrl: ImageConstants.facebooklogo,
                     followed: followed[0],
-                    onFollow: () {
-                      setState(() {
-                        followed[0] = true;
-                      });
-                    },
+                     onFollow: () async {
+    await _launchURL('https://www.facebook.com/people/Ziya-Academy/61571052597141/?_rdr'); 
+    setState(() {
+      followed[0] = true;
+    });
+  },
                   ),
-                   FacebookCard(
-                    followe: TextConstants.follow,
-                    tile: TextConstants.instatitle,
-                    subtitles: TextConstants.instasubtitle,
-                    followtext: TextConstants.follow,
-                    followedsstext: TextConstants.followedtext,
-                    imageUrl: ImageConstants.instalogo,
-                    followed: followed[1],
-                    onFollow: () {
-                      setState(() {
-                        followed[1] = true;
-                      });
-                    },
-                  ),
+                  FacebookCard(
+  followe: TextConstants.follow,
+  tile: TextConstants.instatitle,
+  subtitles: TextConstants.instasubtitle,
+  followtext: TextConstants.follow,
+  followedsstext: TextConstants.followedtext,
+  imageUrl: ImageConstants.instalogo,
+  followed: followed[1],
+  onFollow: () async {
+    await _launchURL('https://www.instagram.com/ziya_academy_/?hl=en'); 
+    setState(() {
+      followed[1] = true;
+    });
+  },
+),
+
+                  
                    FacebookCard(
                     followe: TextConstants.subscribe,
                     tile: TextConstants.yutibtitle,
@@ -90,11 +102,13 @@ class _FollowScreenState extends State<FollowScreen> {
                     followedsstext: TextConstants.subscribed,
                     imageUrl: ImageConstants.youTubelogo,
                     followed: followed[2],
-                    onFollow: () {
-                      setState(() {
-                        followed[2] = true;
-                      });
-                    },
+                    onFollow: () async {
+    await _launchURL('https://www.instagram.com/your_page'); 
+    setState(() {
+      followed[2] = true;
+    });
+  },
+                    
                   ),
                    FacebookCard(
                     followe: TextConstants.join,
@@ -104,11 +118,12 @@ class _FollowScreenState extends State<FollowScreen> {
                     followedsstext: TextConstants.joined,
                     imageUrl: ImageConstants.wattaapplogo,
                     followed: followed[3],
-                    onFollow: () {
-                      setState(() {
-                        followed[3] = true;
-                      });
-                    },
+                     onFollow: () async {
+    await _launchURL('https://www.instagram.com/your_page'); 
+    setState(() {
+      followed[3] = true;
+    });
+  },
                   ),
                    ],
               ),

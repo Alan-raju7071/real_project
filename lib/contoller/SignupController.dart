@@ -44,6 +44,7 @@ class SignupController {
   required String qualification,
   required String occupation,
   required String referralCode,
+  required String name,
   String? imageUrl,
 }) async {
   try {
@@ -56,6 +57,7 @@ class SignupController {
     
     final userData = {
       'email': email,
+      'name': name,
       'dob': dob,
       'gender': gender,
       'location': location,
@@ -67,7 +69,9 @@ class SignupController {
       'timestamp': FieldValue.serverTimestamp(),
     };
 
-    await FirebaseFirestore.instance.collection('users').doc(email).set(userData);
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+await FirebaseFirestore.instance.collection('users').doc(uid).set(userData);
+
     return true;
   } catch (e) {
     debugPrint("Error saving user data: $e");

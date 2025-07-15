@@ -6,6 +6,9 @@ import 'package:real_project/widgets/Custom_Textfield.dart';
 class User_details_container extends StatelessWidget {
   final TextEditingController dobController;
    final TextEditingController emailController;
+   final TextEditingController nameController;
+
+
   final String? selectedGender;
   final void Function()? onDateTap;
   final void Function(String?)? onGenderChanged;
@@ -16,6 +19,7 @@ class User_details_container extends StatelessWidget {
   const User_details_container({
     super.key,
     required this.dobController,
+    required this.nameController,
      required this.emailController,
     required this.selectedGender,
     required this.mobileController,
@@ -35,18 +39,21 @@ class User_details_container extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(TextConstants.username, style: TextStyle(fontWeight: FontWeight.bold)),
-            CustomTextField(
-              label: "Enter your username",
-              labelColor: Colorconstants.primarygrey,
-              keyboardType: TextInputType.text,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter your name';
-                }
-                return null;
-              },
-            ),
+           const SizedBox(height: 16),
+const Text("Full Name", style: TextStyle(fontWeight: FontWeight.bold)),
+const SizedBox(height: 6),
+TextFormField(
+  controller: nameController,
+  decoration: InputDecoration(
+    labelText: "Enter your name",
+    labelStyle: TextStyle(color: Colorconstants.primarygrey),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  ),
+  validator: (value) =>
+      value == null || value.trim().isEmpty ? 'Please enter your name' : null,
+),
+
             const SizedBox(height: 10),
 
             const Text(TextConstants.email, style: TextStyle(fontWeight: FontWeight.bold)),

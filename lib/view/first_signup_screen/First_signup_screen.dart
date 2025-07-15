@@ -68,6 +68,8 @@ final TextEditingController otpController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 final TextEditingController confirmPasswordController = TextEditingController();
 final TextEditingController emailController = TextEditingController();
+final TextEditingController nameController = TextEditingController();
+
 
 
 
@@ -202,6 +204,8 @@ void showMessage(String message) {
   confirmPasswordController.dispose(); 
     super.dispose();
     mobileController.dispose();
+    nameController.dispose();
+
 otpController.dispose();
 
   }
@@ -241,6 +245,7 @@ otpController.dispose();
                 const SizedBox(height: 24),
             User_details_container(
   dobController: dobController,
+   nameController: nameController,
   emailController: emailController, 
   selectedGender: selectedGender,
   onDateTap: () => selectDate(context),
@@ -472,13 +477,14 @@ TextFormField(
       return;
     }
 
-    // If OTP is valid, proceed to image upload and saving user data
+  
     final imageUrl = await SignupController.uploadProfileImage(
       fileImage: profileImage,
       webImageBytes: webImageBytes,
     );
 
     final success = await SignupController.saveUserData(
+       name: nameController.text.trim(),
       dob: dobController.text.trim(),
       email: emailController.text.trim(),
       gender: selectedGender!,

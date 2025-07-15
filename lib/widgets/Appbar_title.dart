@@ -4,7 +4,9 @@ import 'package:real_project/Utilits/constants/image_constants.dart';
 
 
 class AppbarTitle extends StatelessWidget {
-  const AppbarTitle({super.key});
+  final String? userName;
+
+  const AppbarTitle({super.key, this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +40,16 @@ class AppbarTitle extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    "Welcome User",
-                    style: TextStyle(
+                    "HI ${userName ?? 'User'}", 
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "Dashboard",
                     style: TextStyle(
                       fontSize: 13,
