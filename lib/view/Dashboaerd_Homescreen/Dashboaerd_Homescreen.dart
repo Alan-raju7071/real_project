@@ -87,24 +87,30 @@ class _Dashboaerd_HomescreenState extends State<Dashboaerd_Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> bannerImages = [
-      ImageConstants.ziyalogo1,
-      ImageConstants.ziyalogo2,
-      ImageConstants.ziyalogo3,
-      ImageConstants.ziyalogo4,
-    ];
-     List<String> bottombaner = [
-     ImageConstants.ziyalogobottom1,
-     ImageConstants.ziyalogobottom2,
-    ImageConstants.ziyalogobottom3,
-    ImageConstants.ziyalogobottom4
-    ];
+    List<Map<String, String>> bannerImages = [
+  {"image": ImageConstants.ziyalogo1, "url": "https://www.ziyaacademy.co.in/assets/images/Ziya_Academy_Path_to_Success.png"},
+  {"image": ImageConstants.ziyalogo2, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADVvka688dohfIdgNPFf2Szfw8-7MjYWPmQ&s"},
+  {"image": ImageConstants.ziyalogo3, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-k2ZC2FKoVT47gc8TBZiX5n0T4kJj2II9lw&s"},
+  {"image": ImageConstants.ziyalogo4, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFJshYPwOJtRHZ6GsMrKkE53NP48_oLx33cA&s"},
+];
+
+List<Map<String, String>> bottombaner = [
+  {"image": ImageConstants.ziyalogobottom1, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzbPiniWXteFtK9_PIcsJFw9UMZgieIWs1aBtPtrkoElwo4ZT3u9024fgs7CXdA1g7ERE&usqp=CAU"},
+  {"image": ImageConstants.ziyalogobottom2, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2i4xjgfo4XvfNUWJJ83Boh9qCzwguhJczWQ&s"},
+  {"image": ImageConstants.ziyalogobottom3, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQudBKrM7BpKMZZZyyCkFd5clOHKsCkH3GX6Q&s"},
+  {"image": ImageConstants.ziyalogobottom4, "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR35l0GmK7otFHlAInmIlGrkGAxR71cQRkfUg&s"},
+];
+
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colorconstants.primarywhite,
         elevation: 0,
         title: AppbarTitle(userName: userName ?? ""),
+        actions: [ CircleAvatar(
+                  backgroundColor: Colors.blue,
+                  child: Icon(Icons.notifications, color: Colors.white),
+                ),],
       ),
       body: Stack(
   children: [
@@ -118,42 +124,39 @@ class _Dashboaerd_HomescreenState extends State<Dashboaerd_Homescreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: CarouselSlider(
-                options: CarouselOptions(
-                  height: MediaQuery.of(context).size.height * 0.25,
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  viewportFraction: 0.9,
-                ),
-                items: bannerImages.map((imagePath) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: GestureDetector(
-                             onTap: () {
-            _launchURL('https://www.ziyaacademy.co.in/'); 
-          },
-                            child: Image.network(
-                              imagePath,
-                              fit: BoxFit.fill,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.broken_image),
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
+  options: CarouselOptions(
+    height: MediaQuery.of(context).size.height * 0.25,
+    autoPlay: true,
+    enlargeCenterPage: true,
+    viewportFraction: 0.9,
+  ),
+  items: bannerImages.map((banner) {
+    return Builder(
+      builder: (BuildContext context) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: GestureDetector(
+              onTap: () => _launchURL(banner['url']!),
+              child: Image.network(
+                banner['image']!,
+                fit: BoxFit.fill,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
               ),
+            ),
+          ),
+        );
+      },
+    );
+  }).toList(),
+),
+
             ),
         
             
@@ -252,42 +255,39 @@ class _Dashboaerd_HomescreenState extends State<Dashboaerd_Homescreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: CarouselSlider(
-                options: CarouselOptions(
-                  height: MediaQuery.of(context).size.height * 0.20,
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  viewportFraction: 0.9,
-                ),
-                items: bottombaner.map((imagePath) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: GestureDetector(
-                             onTap: () {
-            _launchURL('https://www.ziyaacademy.co.in/'); 
-          },
-                            child: Image.network(
-                              imagePath,
-                              fit: BoxFit.fill,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.broken_image),
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
+  options: CarouselOptions(
+    height: MediaQuery.of(context).size.height * 0.20,
+    autoPlay: true,
+    enlargeCenterPage: true,
+    viewportFraction: 0.9,
+  ),
+  items: bottombaner.map((banner) {
+    return Builder(
+      builder: (BuildContext context) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: GestureDetector(
+              onTap: () => _launchURL(banner['url']!),
+              child: Image.network(
+                banner['image']!,
+                fit: BoxFit.fill,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.broken_image),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
               ),
+            ),
+          ),
+        );
+      },
+    );
+  }).toList(),
+),
+
             ),
             const SizedBox(height: 20),
           ],
